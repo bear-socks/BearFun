@@ -7,7 +7,7 @@ import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 
 //loading sound is not working, not sure why
-//import skyMall from './assets/skyMall.mp3';
+// import skyMall from './assets/skyMall.mp3';
 
 //this is used to avoid having to making global variables for everything
 //that we need to pass between the preload create and update functions
@@ -28,7 +28,7 @@ export default class GameScene extends Phaser.Scene {
     //you can load images from the web like this
     //this.load.image('logo', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
 
-    //why doesn't this work vvv 
+    //why doesn't this work vvv
     //this.load.image('logo', './assets/logo.png');
 		this.load.image('logo', logoImg);
  		this.load.image('bird', birdImg);
@@ -47,13 +47,13 @@ export default class GameScene extends Phaser.Scene {
     //gameState.music.play();
 
     //adding text
-    this.add.text(50, 50, 'i like poop');
+    this.add.text(50, 50, 'harry like poop');
 
     //how to click on stuff
     //has weird bounds that are bigger than the actual picture
     gameState.clickCrate = this.add.sprite(800, 100, 'crate');
     gameState.clickCrate.setInteractive();
-    gameState.clickCrate.on('pointerup', function(){ 
+    gameState.clickCrate.on('pointerup', function(){
       this.x -= 20;
     });
 
