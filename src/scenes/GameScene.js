@@ -6,11 +6,17 @@ import birdImg from './assets/bird.png';
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 
+//loading sound is not working, not sure why
+//import skyMall from './assets/skyMall.mp3';
 
-var keysPlayer1;
-var keysPlayer2;
-var player1;
-var player2;
+//this is used to avoid having to making global variables for everything
+//that we need to pass between the preload create and update functions
+const gameState = {};
+
+// var keysPlayer1;
+//var keysPlayer2;
+//var player1;
+//var player2;
 
 export default class GameScene extends Phaser.Scene {
 	//calling the super constructor
@@ -19,13 +25,37 @@ export default class GameScene extends Phaser.Scene {
 	}
 
 	preload(){
+    //you can load images from the web like this
+    //this.load.image('logo', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
+
+    //why doesn't this work vvv 
+    //this.load.image('logo', './assets/logo.png');
 		this.load.image('logo', logoImg);
  		this.load.image('bird', birdImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
+
+    //this.load.audio('theme', skyMall);
+
 	}
 
 	create(){
+
+    //load music
+    //.wav file did not work for this, think I need something more in the package for that
+    //gameState.music = this.sound.add('theme');
+    //gameState.music.play();
+
+    //adding text
+    this.add.text(50, 50, 'i like poop');
+
+    //how to click on stuff
+    //has weird bounds that are bigger than the actual picture
+    gameState.clickCrate = this.add.sprite(800, 100, 'crate');
+    gameState.clickCrate.setInteractive();
+    gameState.clickCrate.on('pointerup', function(){ 
+      this.x -= 20;
+    });
 
     //https://www.youtube.com/watch?v=sYleQ1uRmjk
     this.items = this.add.group([
@@ -50,63 +80,65 @@ export default class GameScene extends Phaser.Scene {
 
     //combine these into one or no?, might mess things up if I do
     //player 1 keys
-    keysPlayer1 = this.input.keyboard.createCursorKeys();
+    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
     //player 2 keys
-    keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
 		//const logo = this.add.image(400, 150, 'logo');
     //const bird = this.add.image(200, 450, 'bird');
 
-    player1 = this.physics.add.image(600, 300, 'bird');
-    player1.setScale(.5);
-    player1.setCollideWorldBounds(true);
+    gameState.player1 = this.physics.add.image(600, 300, 'bird');
+    gameState.player1.setScale(.5);
+    gameState.player1.setCollideWorldBounds(true);
 
-    player2 = this.physics.add.image(150, 300, 'logo');
-    player2.setScale(.4);
-    player2.setCollideWorldBounds(true);
+    gameState.player2 = this.physics.add.image(150, 300, 'logo');
+    gameState.player2.setScale(.4);
+    gameState.player2.setCollideWorldBounds(true);
 	}
 
   update (){
+
+    //these two methods could easily be consolidated into a single and separate function
     //player1 movement
-    player1.setVelocity(0);
+    gameState.player1.setVelocity(0);
 
-    if (keysPlayer1.left.isDown)
+    if (gameState.keysPlayer1.left.isDown)
     {
-        player1.setVelocityX(-300);
+        gameState.player1.setVelocityX(-300);
     }
-    else if (keysPlayer1.right.isDown)
+    else if (gameState.keysPlayer1.right.isDown)
     {
-        player1.setVelocityX(300);
+        gameState.player1.setVelocityX(300);
     }
 
-    if (keysPlayer1.up.isDown)
+    if (gameState.keysPlayer1.up.isDown)
     {
-        player1.setVelocityY(-300);
+        gameState.player1.setVelocityY(-300);
     }
-    else if (keysPlayer1.down.isDown)
+    else if (gameState.keysPlayer1.down.isDown)
     {
-        player1.setVelocityY(300);
+        gameState.player1.setVelocityY(300);
     }
 
     //player2 movement
-    player2.setVelocity(0);
+    gameState.player2.setVelocity(0);
 
-    if (keysPlayer2.A.isDown)
+    if (gameState.keysPlayer2.A.isDown)
     {
-        player2.setVelocityX(-300);
+        gameState.player2.setVelocityX(-300);
     }
-    else if (keysPlayer2.D.isDown)
+    else if (gameState.keysPlayer2.D.isDown)
     {
-        player2.setVelocityX(300);
+        gameState.player2.setVelocityX(300);
     }
 
-    if (keysPlayer2.W.isDown)
+    if (gameState.keysPlayer2.W.isDown)
     {
-        player2.setVelocityY(-300);
+        gameState.player2.setVelocityY(-300);
     }
-    else if (keysPlayer2.S.isDown)
+    else if (gameState.keysPlayer2.S.isDown)
     {
-        player2.setVelocityY(300);
+        gameState.player2.setVelocityY(300);
     }
   }
 
