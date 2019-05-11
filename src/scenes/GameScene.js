@@ -5,22 +5,22 @@ import logoImg from './assets/logo.png';
 import birdImg from './assets/bird.png';
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
+import bombImg from './assets/bomb.png';
 
 //loading sound is not working, not sure why
 //import skyMall from './assets/skyMall.mp3';
 
 //this is used to avoid having to making global variables for everything
 //that we need to pass between the preload create and update functions
-const gameState = {};
+var gameState = {};
 
 // var keysPlayer1;
 //var keysPlayer2;
-//var player1;
-//var player2;
+// var player1;
+// var player2;
 
-  function createWorld(){
-    this.add.text(50, 50, 'will ke poop');
-  }
+
+  var player;
 
 export default class GameScene extends Phaser.Scene {
 	//calling the super constructor
@@ -38,6 +38,7 @@ export default class GameScene extends Phaser.Scene {
  		this.load.image('bird', birdImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
+    this.load.image('bomb', bombImg);
 
     //this.load.audio('theme', skyMall);
 
@@ -54,9 +55,8 @@ export default class GameScene extends Phaser.Scene {
     //adding text
     this.add.text(50, 50, 'will like poop');
 
-    this.createWorld();
-
     this.createPlayer();
+    this.createWorld();
 
     //how to click on stuff
     //has weird bounds that are bigger than the actual picture
@@ -89,18 +89,67 @@ export default class GameScene extends Phaser.Scene {
 
   }
 
-
   createWorld(){
-    // gameState.platforms = this.physics.add.staticGroup();
-    // gameState.platforms.create(400, 568, 'crate').refreshBody();
+    
+    this.genCrates();
+    this.genBombs();
 
-    gameState.platforms = this.physics.add.group();
-    gameState.platforms.create(400, 568, 'crate').setCollideWorldBounds(true);
+  }
+
+  genCrates(){
+    // gameState.crates = this.physics.add.staticGroup();
+    // gameState.crates.create(400, 568, 'crate').refreshBody();
+    function genCrate(){
+      //how to reference height and with in config.js?
+      const x = Math.random() * 1200;
+      const y = Math.random() * 800;
+      gameState.crates.create(x, y, 'crate').setCollideWorldBounds(true);
+    }
+
+    gameState.crates = this.physics.add.group();
+    gameState.crates.create(400, 568, 'crate').setCollideWorldBounds(true);
+
+    genCrate();
+
+    this.physics.add.collider(gameState.player1, gameState.crates);
+    this.physics.add.collider(gameState.player2, gameState.crates);
+  }
+
+  genBombs(){
+
+    //creating bombs
+    function genBomb(){
+      const x = Math.random() * 1200;
+      const y = Math.random() * 800;
+      gameState.bombs.create(x, y, 'bomb').setScale(.2).setCollideWorldBounds(true);
+    }
+
+    gameState.bombs = this.physics.add.group();
+    
+    const bombGenLoop = this.time.addEvent({
+      delay: 1000,
+      callback: genBomb,
+      callbackScope: this,
+      loop: true
+    });
+
+    //text for numBombs
+    gameState.scoreText = this.add.text(250, 50,'BombsBlown: 0', { fontSize: '15px',
+      fill: '#FFFFFF'})
+    //bombs blow up on crates
+    gameState.bombsBlown = 0;
+    this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
+      bomb.destroy();
+      gameState.bombsBlown += 1;
+      gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
+    });
+
+    this.physics.add.collider(gameState.player1, gameState.bombs);
+    this.physics.add.collider(gameState.player2, gameState.bombs);
+    this.physics.add.collider(gameState.bombs, gameState.bombs);
   }
 
   createPlayer(){
-
-    gameState.players = this.physics.add.group();
 
     //combine these into one or no?, might mess things up if I do
     //player 1 keys
@@ -111,20 +160,32 @@ export default class GameScene extends Phaser.Scene {
     //const logo = this.add.image(400, 150, 'logo');
     //const bird = this.add.image(200, 450, 'bird');
 
-    gameState.player1 = this.physics.add.image(600, 300, 'bird');
+    // player = this.physics.add.sprite(100, 450, 'bird');
+
+    // player.setBounce(0.2);
+    // player.setCollideWorldBounds(true);
+
+
+    //add players to one group?
+    gameState.player1 = this.physics.add.sprite(600, 300, 'bird');
     gameState.player1.setScale(.5);
+    gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
-    //this.physics.add.collider(gameState.player1, gameState.platforms);
+
+    //gameState.player1 = player1;
+    //this.physics.add.collider(gameState.player1, gameState.crates);
 
     gameState.player2 = this.physics.add.sprite(150, 300, 'logo');
     gameState.player2.setCollideWorldBounds(true);
     gameState.player2.setScale(.4);
 
-    gameState.players.add(gameState.player1);
-    gameState.players.add(gameState.player2);
+    gameState.players = this.physics.add.group();
 
-    this.physics.add.collider(gameState.players, gameState.platforms);
-    this.physics.add.collider(gameState.players, gameState.players);
+    // gameState.players.create(gameState.player1);
+    // gameState.players.create(gameState.player2);
+
+    this.physics.add.collider(gameState.player2, gameState.player1);
+    //this.physics.add.collider(gameState.players, player);
   }
 
 
@@ -132,7 +193,7 @@ export default class GameScene extends Phaser.Scene {
 
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
-    gameState.player1.setVelocity(0);
+    //gameState.player1.setVelocity(0);
 
     if (gameState.keysPlayer1.left.isDown)
     {
@@ -153,7 +214,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     //player2 movement
-    gameState.player2.setVelocity(0);
+    //gameState.player2.setVelocity(0);
 
     if (gameState.keysPlayer2.A.isDown)
     {
