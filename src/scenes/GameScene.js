@@ -7,7 +7,7 @@ import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 
 //loading sound is not working, not sure why
-// import skyMall from './assets/skyMall.mp3';
+//import skyMall from './assets/skyMall.mp3';
 
 //this is used to avoid having to making global variables for everything
 //that we need to pass between the preload create and update functions
@@ -17,6 +17,10 @@ const gameState = {};
 //var keysPlayer2;
 //var player1;
 //var player2;
+
+  function createWorld(){
+    this.add.text(50, 50, 'will ke poop');
+  }
 
 export default class GameScene extends Phaser.Scene {
 	//calling the super constructor
@@ -39,7 +43,8 @@ export default class GameScene extends Phaser.Scene {
 
 	}
 
-	create(){
+
+  create(){
 
     //load music
     //.wav file did not work for this, think I need something more in the package for that
@@ -47,7 +52,11 @@ export default class GameScene extends Phaser.Scene {
     //gameState.music.play();
 
     //adding text
-    this.add.text(50, 50, 'harry like poop');
+    this.add.text(50, 50, 'will like poop');
+
+    this.createWorld();
+
+    this.createPlayer();
 
     //how to click on stuff
     //has weird bounds that are bigger than the actual picture
@@ -78,23 +87,46 @@ export default class GameScene extends Phaser.Scene {
     //giving these pictures depth 1 makes them above the players
     this.items.setDepth(1);
 
+  }
+
+
+  createWorld(){
+    // gameState.platforms = this.physics.add.staticGroup();
+    // gameState.platforms.create(400, 568, 'crate').refreshBody();
+
+    gameState.platforms = this.physics.add.group();
+    gameState.platforms.create(400, 568, 'crate').setCollideWorldBounds(true);
+  }
+
+  createPlayer(){
+
+    gameState.players = this.physics.add.group();
+
     //combine these into one or no?, might mess things up if I do
     //player 1 keys
     gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
     //player 2 keys
     gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
-		//const logo = this.add.image(400, 150, 'logo');
+    //const logo = this.add.image(400, 150, 'logo');
     //const bird = this.add.image(200, 450, 'bird');
 
     gameState.player1 = this.physics.add.image(600, 300, 'bird');
     gameState.player1.setScale(.5);
     gameState.player1.setCollideWorldBounds(true);
+    //this.physics.add.collider(gameState.player1, gameState.platforms);
 
-    gameState.player2 = this.physics.add.image(150, 300, 'logo');
-    gameState.player2.setScale(.4);
+    gameState.player2 = this.physics.add.sprite(150, 300, 'logo');
     gameState.player2.setCollideWorldBounds(true);
-	}
+    gameState.player2.setScale(.4);
+
+    gameState.players.add(gameState.player1);
+    gameState.players.add(gameState.player2);
+
+    this.physics.add.collider(gameState.players, gameState.platforms);
+    this.physics.add.collider(gameState.players, gameState.players);
+  }
+
 
   update (){
 
@@ -144,17 +176,3 @@ export default class GameScene extends Phaser.Scene {
 
 }
 
-
-  // this.tweens.add({
-  //   targets: logo,
-  //   y: 450,
-  //   duration: 2000,
-  //   ease: "Power2",
-  //   yoyo: true,
-  //   loop: -1
-  // });
-
-  // scene: {
-  //   preload: preload,
-  //   create: create
-  // }
