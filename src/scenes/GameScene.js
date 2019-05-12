@@ -2,7 +2,7 @@ import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
 import logoImg from './assets/logo.png';
-import birdImg from './assets/bird.png';
+import birdImg from './assets/blueJayRight.png';
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -20,7 +20,7 @@ var gameState = {};
 // var player2;
 
 
-  var player;
+  //var player;
 
 export default class GameScene extends Phaser.Scene {
 	//calling the super constructor
@@ -113,6 +113,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(gameState.player1, gameState.crates);
     this.physics.add.collider(gameState.player2, gameState.crates);
+    //not sure if this causes problems or not 
+    this.physics.add.collider(gameState.crates, gameState.crates);
   }
 
   genBombs(){
@@ -126,8 +128,8 @@ export default class GameScene extends Phaser.Scene {
 
     gameState.bombs = this.physics.add.group();
     
-    const bombGenLoop = this.time.addEvent({
-      delay: 1000,
+    gameState.bombGenLoop = this.time.addEvent({
+      delay: 5000,
       callback: genBomb,
       callbackScope: this,
       loop: true
@@ -186,9 +188,27 @@ export default class GameScene extends Phaser.Scene {
     // gameState.players.create(gameState.player2);
 
     this.physics.add.collider(gameState.player2, gameState.player1, () => {
-      this.add.text(500, 500, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
+      this.add.text(100, 100, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
+      this.stopGame();
+      
+      this.input.on('pointerup', () => {
+        this.restartGame();
+      })
     });
     //this.physics.add.collider(gameState.players, player);
+  }
+
+  //do everything necessary to pause the game
+  stopGame(){
+      //stop generating bombs
+      gameState.bombGenLoop.destroy();
+      //stop physics
+      this.physics.pause();
+  }
+
+  //do everything necessary to restart the game
+  restartGame(){
+    this.scene.restart();
   }
 
   update (){
