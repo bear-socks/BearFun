@@ -184,10 +184,11 @@ export default class GameScene extends Phaser.Scene {
     // gameState.players.create(gameState.player1);
     // gameState.players.create(gameState.player2);
 
-    this.physics.add.collider(gameState.player2, gameState.player1);
+    this.physics.add.collider(gameState.player2, gameState.player1, () => {
+      this.add.text(500, 500, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
+    });
     //this.physics.add.collider(gameState.players, player);
   }
-
 
   update (){
 
