@@ -20,7 +20,7 @@ var gameState = {};
 // var player2;
 
 
-  var player;
+  //var player;
 
 export default class GameScene extends Phaser.Scene {
 	//calling the super constructor
@@ -90,7 +90,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createWorld(){
-    
+
     this.genCrates();
     this.genBombs();
 
@@ -125,7 +125,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameState.bombs = this.physics.add.group();
-    
+
     const bombGenLoop = this.time.addEvent({
       delay: 1000,
       callback: genBomb,
@@ -238,4 +238,3 @@ export default class GameScene extends Phaser.Scene {
   }
 
 }
-
