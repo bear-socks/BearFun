@@ -2,11 +2,7 @@ import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
 import logoImg from './assets/logo.png';
-<<<<<<< HEAD
 import birdRImg from './assets/blueJayRight.png';
-=======
-import birdImg from './assets/blueJayRight.png';
->>>>>>> b1debcf2ef14abb94f29f95b2be7c92d02143412
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -38,13 +34,8 @@ export default class GameScene extends Phaser.Scene {
 
     //why doesn't this work vvv
     //this.load.image('logo', './assets/logo.png');
-<<<<<<< HEAD
 		this.load.image('logo', logoImg);
  		this.load.image('bird', birdRImg);
-=======
-    this.load.image('logo', logoImg);
-    this.load.image('bird', birdImg);
->>>>>>> b1debcf2ef14abb94f29f95b2be7c92d02143412
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
@@ -103,7 +94,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createWorld(){
-    
+
     this.genCrates();
     this.genBombs();
 
@@ -126,7 +117,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(gameState.player1, gameState.crates);
     this.physics.add.collider(gameState.player2, gameState.crates);
-    //not sure if this causes problems or not 
+    //not sure if this causes problems or not
     this.physics.add.collider(gameState.crates, gameState.crates);
   }
 
@@ -140,7 +131,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameState.bombs = this.physics.add.group();
-    
+
     gameState.bombGenLoop = this.time.addEvent({
       delay: 5000,
       callback: genBomb,
@@ -203,7 +194,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(gameState.player2, gameState.player1, () => {
       this.add.text(100, 100, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
       this.stopGame();
-      
+
       this.input.on('pointerup', () => {
         this.restartGame();
       })
@@ -331,4 +322,3 @@ export default class GameScene extends Phaser.Scene {
   }
 
 }
-
