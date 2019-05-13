@@ -2,7 +2,11 @@ import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
 import logoImg from './assets/logo.png';
+<<<<<<< HEAD
 import birdRImg from './assets/blueJayRight.png';
+=======
+import birdImg from './assets/blueJayRight.png';
+>>>>>>> b1debcf2ef14abb94f29f95b2be7c92d02143412
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -23,29 +27,38 @@ var gameState = {};
   //var player;
 
 export default class GameScene extends Phaser.Scene {
-	//calling the super constructor
-	constructor(){
-		super('Game')
-	}
+  //calling the super constructor
+  constructor(){
+    super('Game')
+  }
 
-	preload(){
+  preload(){
     //you can load images from the web like this
     //this.load.image('logo', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
 
     //why doesn't this work vvv
     //this.load.image('logo', './assets/logo.png');
+<<<<<<< HEAD
 		this.load.image('logo', logoImg);
  		this.load.image('bird', birdRImg);
+=======
+    this.load.image('logo', logoImg);
+    this.load.image('bird', birdImg);
+>>>>>>> b1debcf2ef14abb94f29f95b2be7c92d02143412
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
 
     //this.load.audio('theme', skyMall);
 
-	}
+  }
 
 
   create(){
+    gameState.keysText = this.add.text(300, 100, '');
+
+    //used in special movement (for dash attacking)
+    gameState.lastKeys = {};
 
     //load music
     //.wav file did not work for this, think I need something more in the package for that
@@ -90,7 +103,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createWorld(){
-
+    
     this.genCrates();
     this.genBombs();
 
@@ -113,6 +126,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(gameState.player1, gameState.crates);
     this.physics.add.collider(gameState.player2, gameState.crates);
+    //not sure if this causes problems or not 
+    this.physics.add.collider(gameState.crates, gameState.crates);
   }
 
   genBombs(){
@@ -125,9 +140,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameState.bombs = this.physics.add.group();
-
-    const bombGenLoop = this.time.addEvent({
-      delay: 1000,
+    
+    gameState.bombGenLoop = this.time.addEvent({
+      delay: 5000,
       callback: genBomb,
       callbackScope: this,
       loop: true
@@ -186,12 +201,31 @@ export default class GameScene extends Phaser.Scene {
     // gameState.players.create(gameState.player2);
 
     this.physics.add.collider(gameState.player2, gameState.player1, () => {
-      this.add.text(500, 500, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
+      this.add.text(100, 100, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
+      this.stopGame();
+      
+      this.input.on('pointerup', () => {
+        this.restartGame();
+      })
     });
     //this.physics.add.collider(gameState.players, player);
   }
 
+  //do everything necessary to pause the game
+  stopGame(){
+      //stop generating bombs
+      gameState.bombGenLoop.destroy();
+      //stop physics
+      this.physics.pause();
+  }
+
+  //do everything necessary to restart the game
+  restartGame(){
+    this.scene.restart();
+  }
+
   update (){
+
 
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
@@ -235,6 +269,66 @@ export default class GameScene extends Phaser.Scene {
     {
         gameState.player2.setVelocityY(300);
     }
+
+    this.specialMovement();
+  }
+
+  move(key, multiplier){
+    if(key == gameState.lastKeys.left){
+      gameState.player1.setVelocityX(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.right){
+      gameState.player1.setVelocityX(300 * multiplier);
+    }
+    if(key == gameState.lastKeys.up){
+      gameState.player1.setVelocityY(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.down){
+      gameState.player1.setVelocityY(300 * multiplier);
+    }
+  }
+
+  //bug here, dash gets messed up
+  specialMovement(){
+    let str = '';
+    for (var key in gameState.lastKeys) {
+      if (gameState.lastKeys[key] >= 1) {
+        gameState.lastKeys[key] -= 1;
+      }
+      else if(gameState.lastKeys[key] <= -1){
+        gameState.lastKeys[key] += 1;
+        this.move(gameState.lastKeys[key], 3);
+      }
+      str += key +': ' + gameState.lastKeys[key] + ' ; ';
+    }
+
+    gameState.keysText.setText(str);
+
+    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
+      //could I send this in as a pointer instead of an int value?
+      gameState.lastKeys.left = this.specialMovementKeyVal(gameState.lastKeys.left);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
+      gameState.lastKeys.right = this.specialMovementKeyVal(gameState.lastKeys.right);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
+      gameState.lastKeys.up = this.specialMovementKeyVal(gameState.lastKeys.up);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
+      gameState.lastKeys.down = this.specialMovementKeyVal(gameState.lastKeys.down);
+    }
+
+  }
+
+  specialMovementKeyVal(key){
+    if(key > 0){
+        //gameState.player1.setVelocityX(-2400);
+        return -15;
+      }
+      else{
+        return 12;
+      }
   }
 
 }
+
