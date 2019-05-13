@@ -46,6 +46,10 @@ export default class GameScene extends Phaser.Scene {
 
 
   create(){
+    gameState.keysText = this.add.text(300, 100, '');
+
+    //used in special movement (for dash attacking)
+    gameState.lastKeys = {};
 
     //load music
     //.wav file did not work for this, think I need something more in the package for that
@@ -213,6 +217,7 @@ export default class GameScene extends Phaser.Scene {
 
   update (){
 
+
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
     gameState.player1.setVelocity(0);
@@ -255,6 +260,65 @@ export default class GameScene extends Phaser.Scene {
     {
         gameState.player2.setVelocityY(300);
     }
+
+    this.specialMovement();
+  }
+
+  move(key, multiplier){
+    if(key == gameState.lastKeys.left){
+      gameState.player1.setVelocityX(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.right){
+      gameState.player1.setVelocityX(300 * multiplier);
+    }
+    if(key == gameState.lastKeys.up){
+      gameState.player1.setVelocityY(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.down){
+      gameState.player1.setVelocityY(300 * multiplier);
+    }
+  }
+
+  //bug here, dash gets messed up
+  specialMovement(){
+    let str = '';
+    for (var key in gameState.lastKeys) {
+      if (gameState.lastKeys[key] >= 1) {
+        gameState.lastKeys[key] -= 1;
+      }
+      else if(gameState.lastKeys[key] <= -1){
+        gameState.lastKeys[key] += 1;
+        this.move(gameState.lastKeys[key], 3);
+      }
+      str += key +': ' + gameState.lastKeys[key] + ' ; ';
+    }
+
+    gameState.keysText.setText(str);
+
+    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
+      //could I send this in as a pointer instead of an int value?
+      gameState.lastKeys.left = this.specialMovementKeyVal(gameState.lastKeys.left);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
+      gameState.lastKeys.right = this.specialMovementKeyVal(gameState.lastKeys.right);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
+      gameState.lastKeys.up = this.specialMovementKeyVal(gameState.lastKeys.up);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
+      gameState.lastKeys.down = this.specialMovementKeyVal(gameState.lastKeys.down);
+    }
+
+  }
+
+  specialMovementKeyVal(key){
+    if(key > 0){
+        //gameState.player1.setVelocityX(-2400);
+        return -15;
+      }
+      else{
+        return 12;
+      }
   }
 
 }
