@@ -21,13 +21,20 @@ class Tile {
     pushMatrix();
     translate(x,y);
     beginShape();
+    
+        
+    for(int i : verts){
+     print(i + ", "); 
+    }
+    println();
+    
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
       if (verts[i] == 1) {
         placeVertex(i);
       }
     }
-    endShape();
+    endShape(CLOSE);
     popMatrix();
   }
 
@@ -50,18 +57,19 @@ class Tile {
     case 6:
       vertex(SIZE, 0);
     case 7:
-      vertex(SIZE, SIZE / 2);
+      vertex(SIZE / 2, 0);
     }
-    endShape(CLOSE);
+
   }
 
   int[] genVerts(float r) {
     int[] verts = new int[8];
     
-    if(r < 1){
+    if(r < 0){
       verts = genVerts(0, 7);
     }
     else if(r < 10){
+      println("here");
       int corner = 0;
       int oppositeCorner = (corner + 4) % 8;
       verts = genVerts(corner, oppositeCorner);
@@ -72,7 +80,7 @@ class Tile {
     //}
     
     verts = randomRotation(verts);
-    
+
     return verts;
   }
   
