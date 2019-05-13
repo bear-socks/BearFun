@@ -2,7 +2,7 @@ import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
 import logoImg from './assets/logo.png';
-import birdImg from './assets/bird.png';
+import birdRImg from './assets/bird.png';
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -35,7 +35,7 @@ export default class GameScene extends Phaser.Scene {
     //why doesn't this work vvv
     //this.load.image('logo', './assets/logo.png');
 		this.load.image('logo', logoImg);
- 		this.load.image('bird', birdImg);
+ 		this.load.image('bird', birdRImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
