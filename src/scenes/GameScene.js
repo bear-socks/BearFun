@@ -49,8 +49,6 @@ export default class GameScene extends Phaser.Scene {
   create(){
     gameState.keysText = this.add.text(300, 100, '');
 
-    //used in special movement (for dash attacking)
-    gameState.lastKeys = {};
 
     //load music
     //.wav file did not work for this, think I need something more in the package for that
@@ -158,12 +156,6 @@ export default class GameScene extends Phaser.Scene {
 
   createPlayer(){
 
-    //combine these into one or no?, might mess things up if I do
-    //player 1 keys
-    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
-    //player 2 keys
-    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
-
     //const logo = this.add.image(400, 150, 'cardinalR');
     //const bird = this.add.image(200, 450, 'blueJayR');
 
@@ -191,10 +183,22 @@ export default class GameScene extends Phaser.Scene {
 
     gameState.player2.coolDown = 0;
 
+    //think I can delete this line
     gameState.players = this.physics.add.group();
 
     // gameState.players.create(gameState.player1);
     // gameState.players.create(gameState.player2);
+
+    //keyboard stuff
+    //combine these into one or no?, might mess things up if I do
+    //player 1 keys
+    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+    //used in special movement (for dash attacking)
+    gameState.player1.lastKeys = {};
+    //player 2 keys
+    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+    gameState.player2.lastKeys = {};
+
 
     this.physics.add.collider(gameState.player2, gameState.player1, () => {
       this.add.text(100, 100, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
@@ -221,23 +225,28 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update (){
-
-
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
+    gameState.player1.setVelocity(0);
     if(gameState.player1.coolDown == 0){
       this.player1Movement();
     }
+    else{
+      gameState.player1.coolDown -= 1;
+    }
 
+    //player2 movement
+    gameState.player2.setVelocity(0);
     if(gameState.player2.coolDown == 0){
       this.player2Movement();
     }
+    else{
+      gameState.player2.coolDown -= 1;
+    }
 
-    this.specialMovement();
   }
 
   player1Movement(){
-    gameState.player1.setVelocity(0);
 
     if (gameState.keysPlayer1.left.isDown)
     {
@@ -258,11 +267,11 @@ export default class GameScene extends Phaser.Scene {
     {
         gameState.player1.setVelocityY(300);
     }
+    this.specialMovement1();
   }
 
   player2Movement(){
       //player2 movement
-      gameState.player2.setVelocity(0);
 
       if (gameState.keysPlayer2.A.isDown)
       {
@@ -281,93 +290,112 @@ export default class GameScene extends Phaser.Scene {
       {
           gameState.player2.setVelocityY(300);
       }
+      this.specialMovement2();
   }
 
   //I think this is where the dashing problem is
   move(key, multiplier){
     //key is a number instead of a pointer which is the problem
     //this.add.text(600, 600, key);
-    if(key == gameState.lastKeys.left){
+    if(key == gameState.player1.lastKeys.left){
       gameState.player1.setVelocityX(-300 * multiplier);
     }
-    if(key == gameState.lastKeys.right){
+    if(key == gameState.player1.lastKeys.right){
       gameState.player1.setVelocityX(300 * multiplier);
     }
-    if(key == gameState.lastKeys.up){
+    if(key == gameState.player1.lastKeys.up){
       gameState.player1.setVelocityY(-300 * multiplier);
     }
-    if(key == gameState.lastKeys.down){
+    if(key == gameState.player1.lastKeys.down){
       gameState.player1.setVelocityY(300 * multiplier);
     }
 
-    if(key == gameState.lastKeys.A){
+    if(key == gameState.player2.lastKeys.A){
       gameState.player2.setVelocityX(-300 * multiplier);
     }
-    if(key == gameState.lastKeys.D){
+    if(key == gameState.player2.lastKeys.D){
       gameState.player2.setVelocityX(300 * multiplier);
     }
-    if(key == gameState.lastKeys.W){
+    if(key == gameState.player2.lastKeys.W){
       gameState.player2.setVelocityY(-300 * multiplier);
     }
-    if(key == gameState.lastKeys.S){
+    if(key == gameState.player2.lastKeys.S){
       gameState.player2.setVelocityY(300 * multiplier);
     }
   }
 
-  //bug here, dash gets messed up
-  specialMovement(){
-    let str = '';
-    for (var key in gameState.lastKeys) {
-      if (gameState.lastKeys[key] >= 1) {
-        gameState.lastKeys[key] -= 1;
+  specialMovement1(){
+      this.specialMovement(gameState.player1.lastKeys);
+
+      if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
+        //could I send this in as a pointer instead of an int value?
+        gameState.player1.lastKeys.left = this.specialMovementKeyVal(gameState.player1.lastKeys.left);
       }
-      else if(gameState.lastKeys[key] <= -1){
-        this.move(gameState.lastKeys[key], 3);
-        if(gameState.lastKeys[key] == -1){
-          this.setCoolDown(gameState.lastKeys[key]);
+      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
+        gameState.player1.lastKeys.right = this.specialMovementKeyVal(gameState.player1.lastKeys.right);
+      }
+      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
+        gameState.player1.lastKeys.up = this.specialMovementKeyVal(gameState.player1.lastKeys.up);
+      }
+      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
+        gameState.player1.lastKeys.down = this.specialMovementKeyVal(gameState.player1.lastKeys.down);
+      }
+  }
+
+  specialMovement2(){
+        this.specialMovement(gameState.player2.lastKeys);
+        //player 2
+        if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
+          //could I send this in as a pointer instead of an int value?
+          gameState.player2.lastKeys.A = this.specialMovementKeyVal(gameState.player2.lastKeys.A);
         }
-        gameState.lastKeys[key] += 1;
+        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
+          gameState.player2.lastKeys.D = this.specialMovementKeyVal(gameState.player2.lastKeys.D);
+        }
+        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
+          gameState.player2.lastKeys.W = this.specialMovementKeyVal(gameState.player2.lastKeys.W);
+        }
+        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
+          gameState.player2.lastKeys.S = this.specialMovementKeyVal(gameState.player2.lastKeys.S);
+        }
+  }
+
+  //lKeys is a lastKeys object
+  specialMovement(lKeys){
+    let str = '';
+    for (var key in lKeys) {
+      if (lKeys[key] >= 1) {
+        lKeys[key] -= 1;
       }
-      str += key +': ' + gameState.lastKeys[key] + ' ; ';
+      else if(lKeys[key] <= -1){
+        this.move(lKeys[key], 3);
+        if(lKeys[key] == -1){
+          this.setCoolDown(lKeys[key]);
+        }
+        lKeys[key] += 1;
+      }
+      str += key +': ' + lKeys[key] + ' ; ';
     }
 
+    //doesn't show up for player1, because player2 happens second in the same frame
     gameState.keysText.setText(str);
-
-    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
-      //could I send this in as a pointer instead of an int value?
-      gameState.lastKeys.left = this.specialMovementKeyVal(gameState.lastKeys.left);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
-      gameState.lastKeys.right = this.specialMovementKeyVal(gameState.lastKeys.right);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
-      gameState.lastKeys.up = this.specialMovementKeyVal(gameState.lastKeys.up);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
-      gameState.lastKeys.down = this.specialMovementKeyVal(gameState.lastKeys.down);
-    }
-
-    //player 2
-    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
-      //could I send this in as a pointer instead of an int value?
-      gameState.lastKeys.A = this.specialMovementKeyVal(gameState.lastKeys.A);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
-      gameState.lastKeys.D = this.specialMovementKeyVal(gameState.lastKeys.D);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
-      gameState.lastKeys.W = this.specialMovementKeyVal(gameState.lastKeys.W);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
-      gameState.lastKeys.S = this.specialMovementKeyVal(gameState.lastKeys.S);
-    }
 
   }
 
   //remember this is only comparing values not pointers but should still work
+  //coolDown of 30 frames currently
   setCoolDown(key){
-    if(gameState.lastKeys.left == key){
-
+    if(gameState.player1.lastKeys.left == key ||
+      gameState.player1.lastKeys.right == key ||
+      gameState.player1.lastKeys.up == key ||
+      gameState.player1.lastKeys.down == key){
+        gameState.player1.coolDown = 30;
+    }
+    else if(gameState.player2.lastKeys.A == key ||
+      gameState.player2.lastKeys.D == key ||
+      gameState.player2.lastKeys.W == key ||
+      gameState.player2.lastKeys.S == key){
+        gameState.player2.coolDown = 30;
     }
   }
 
