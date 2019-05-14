@@ -1,8 +1,9 @@
 import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
-import logoImg from './assets/logo.png';
-import birdRImg from './assets/blueJayRight.png';
+import cardinalRImg from './assets/cardinalRight.png';
+import blueRImg from './assets/blueJayRight.png';
+//import birdLImg from './assets/blueJayLeft.png';
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -30,12 +31,12 @@ export default class GameScene extends Phaser.Scene {
 
   preload(){
     //you can load images from the web like this
-    //this.load.image('logo', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
+    //this.load.image('cardinalR', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
 
     //why doesn't this work vvv
-    //this.load.image('logo', './assets/logo.png');
-		this.load.image('logo', logoImg);
- 		this.load.image('bird', birdRImg);
+    //this.load.image('cardinalR', './assets/logo.png');
+		this.load.image('cardinalR', cardinalRImg);
+ 		this.load.image('blueJayR', blueRImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
@@ -163,17 +164,17 @@ export default class GameScene extends Phaser.Scene {
     //player 2 keys
     gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
-    //const logo = this.add.image(400, 150, 'logo');
-    //const bird = this.add.image(200, 450, 'bird');
+    //const logo = this.add.image(400, 150, 'cardinalR');
+    //const bird = this.add.image(200, 450, 'blueJayR');
 
-    // player = this.physics.add.sprite(100, 450, 'bird');
+    // player = this.physics.add.sprite(100, 450, 'blueJayR');
 
     // player.setBounce(0.2);
     // player.setCollideWorldBounds(true);
 
 
     //add players to one group?
-    gameState.player1 = this.physics.add.sprite(600, 300, 'bird');
+    gameState.player1 = this.physics.add.sprite(800, 300, 'blueJayR');
     gameState.player1.setScale(1.5);
     gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
@@ -183,9 +184,9 @@ export default class GameScene extends Phaser.Scene {
     //gameState.player1 = player1;
     //this.physics.add.collider(gameState.player1, gameState.crates);
 
-    gameState.player2 = this.physics.add.sprite(150, 300, 'logo');
+    gameState.player2 = this.physics.add.sprite(100, 300, 'cardinalR');
     gameState.player2.setCollideWorldBounds(true);
-    gameState.player2.setScale(.4);
+    gameState.player2.setScale(1.5);
     gameState.player2.setX(400);
 
     gameState.player2.coolDown = 0;
@@ -322,10 +323,10 @@ export default class GameScene extends Phaser.Scene {
       }
       else if(gameState.lastKeys[key] <= -1){
         this.move(gameState.lastKeys[key], 3);
-        gameState.lastKeys[key] += 1;
         if(gameState.lastKeys[key] == -1){
           this.setCoolDown(gameState.lastKeys[key]);
         }
+        gameState.lastKeys[key] += 1;
       }
       str += key +': ' + gameState.lastKeys[key] + ' ; ';
     }
@@ -363,10 +364,11 @@ export default class GameScene extends Phaser.Scene {
 
   }
 
+  //remember this is only comparing values not pointers but should still work
   setCoolDown(key){
-    //if(gameState.lastKeys.left){
-    //
-    // }
+    if(gameState.lastKeys.left == key){
+
+    }
   }
 
   specialMovementKeyVal(key){
