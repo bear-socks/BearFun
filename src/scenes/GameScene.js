@@ -178,6 +178,8 @@ export default class GameScene extends Phaser.Scene {
     gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
 
+    gameState.player1.coolDown = 0;
+
     //gameState.player1 = player1;
     //this.physics.add.collider(gameState.player1, gameState.crates);
 
@@ -185,6 +187,8 @@ export default class GameScene extends Phaser.Scene {
     gameState.player2.setCollideWorldBounds(true);
     gameState.player2.setScale(.4);
     gameState.player2.setX(400);
+
+    gameState.player2.coolDown = 0;
 
     gameState.players = this.physics.add.group();
 
@@ -220,6 +224,18 @@ export default class GameScene extends Phaser.Scene {
 
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
+    if(gameState.player1.coolDown == 0){
+      this.player1Movement();
+    }
+
+    if(gameState.player2.coolDown == 0){
+      this.player2Movement();
+    }
+
+    this.specialMovement();
+  }
+
+  player1Movement(){
     gameState.player1.setVelocity(0);
 
     if (gameState.keysPlayer1.left.isDown)
@@ -241,32 +257,35 @@ export default class GameScene extends Phaser.Scene {
     {
         gameState.player1.setVelocityY(300);
     }
-
-    //player2 movement
-    gameState.player2.setVelocity(0);
-
-    if (gameState.keysPlayer2.A.isDown)
-    {
-        gameState.player2.setVelocityX(-300);
-    }
-    else if (gameState.keysPlayer2.D.isDown)
-    {
-        gameState.player2.setVelocityX(300);
-    }
-
-    if (gameState.keysPlayer2.W.isDown)
-    {
-        gameState.player2.setVelocityY(-300);
-    }
-    else if (gameState.keysPlayer2.S.isDown)
-    {
-        gameState.player2.setVelocityY(300);
-    }
-
-    this.specialMovement();
   }
 
+  player2Movement(){
+      //player2 movement
+      gameState.player2.setVelocity(0);
+
+      if (gameState.keysPlayer2.A.isDown)
+      {
+          gameState.player2.setVelocityX(-300);
+      }
+      else if (gameState.keysPlayer2.D.isDown)
+      {
+          gameState.player2.setVelocityX(300);
+      }
+
+      if (gameState.keysPlayer2.W.isDown)
+      {
+          gameState.player2.setVelocityY(-300);
+      }
+      else if (gameState.keysPlayer2.S.isDown)
+      {
+          gameState.player2.setVelocityY(300);
+      }
+  }
+
+  //I think this is where the dashing problem is
   move(key, multiplier){
+    //key is a number instead of a pointer which is the problem
+    //this.add.text(600, 600, key);
     if(key == gameState.lastKeys.left){
       gameState.player1.setVelocityX(-300 * multiplier);
     }
@@ -279,6 +298,19 @@ export default class GameScene extends Phaser.Scene {
     if(key == gameState.lastKeys.down){
       gameState.player1.setVelocityY(300 * multiplier);
     }
+
+    if(key == gameState.lastKeys.A){
+      gameState.player2.setVelocityX(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.D){
+      gameState.player2.setVelocityX(300 * multiplier);
+    }
+    if(key == gameState.lastKeys.W){
+      gameState.player2.setVelocityY(-300 * multiplier);
+    }
+    if(key == gameState.lastKeys.S){
+      gameState.player2.setVelocityY(300 * multiplier);
+    }
   }
 
   //bug here, dash gets messed up
@@ -289,8 +321,11 @@ export default class GameScene extends Phaser.Scene {
         gameState.lastKeys[key] -= 1;
       }
       else if(gameState.lastKeys[key] <= -1){
-        gameState.lastKeys[key] += 1;
         this.move(gameState.lastKeys[key], 3);
+        gameState.lastKeys[key] += 1;
+        if(gameState.lastKeys[key] == -1){
+          this.setCoolDown(gameState.lastKeys[key]);
+        }
       }
       str += key +': ' + gameState.lastKeys[key] + ' ; ';
     }
@@ -311,6 +346,27 @@ export default class GameScene extends Phaser.Scene {
       gameState.lastKeys.down = this.specialMovementKeyVal(gameState.lastKeys.down);
     }
 
+    //player 2
+    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
+      //could I send this in as a pointer instead of an int value?
+      gameState.lastKeys.A = this.specialMovementKeyVal(gameState.lastKeys.A);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
+      gameState.lastKeys.D = this.specialMovementKeyVal(gameState.lastKeys.D);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
+      gameState.lastKeys.W = this.specialMovementKeyVal(gameState.lastKeys.W);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
+      gameState.lastKeys.S = this.specialMovementKeyVal(gameState.lastKeys.S);
+    }
+
+  }
+
+  setCoolDown(key){
+    //if(gameState.lastKeys.left){
+    //
+    // }
   }
 
   specialMovementKeyVal(key){
