@@ -225,10 +225,12 @@ export default class GameScene extends Phaser.Scene {
     if (gameState.keysPlayer1.left.isDown)
     {
         gameState.player1.setVelocityX(-300);
+        gameState.player1.flipX = true;
     }
     else if (gameState.keysPlayer1.right.isDown)
     {
         gameState.player1.setVelocityX(300);
+        gameState.player1.flipX = false;
     }
 
     if (gameState.keysPlayer1.up.isDown)
