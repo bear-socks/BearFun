@@ -109,4 +109,13 @@ class Tile {
    //rotate(((int) random(4)) * PI / 2);
    return verts; 
   }
+  
+  boolean isSquare(){
+   for(int n : verts){
+     if(n == 0){
+       return false;
+     }
+   }
+   return true;
+  }
 }
