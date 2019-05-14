@@ -155,13 +155,56 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(gameState.bombs, gameState.bombs);
   }
 
-  createPlayer(){
+  createPlayer(p1 = true, p2 = true){
+
 
     //combine these into one or no?, might mess things up if I do
     //player 1 keys
-    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+  //  gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+    gameState.keysPlayer1 = this.input.keyboard.addKeys('left,right,up,down,shift');
     //player 2 keys
     gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+
+    //calls player create functions
+    if (p1){
+      this.createPlayer1()
+    }
+    if (p2){
+      this.createPlayer2()
+    }
+
+    gameState.resetPlayer1 = -1;
+    gameState.resetPlayer2 = -1;
+
+    //gameState.players = this.physics.add.group();
+
+    // gameState.players.create(gameState.player1);
+    // gameState.players.create(gameState.player2);
+
+    this.physics.add.collider(gameState.player2, gameState.player1, () => {
+      this.gotBeaked();
+
+      //this.input.on('pointerup', () => {
+        //this.restartGame();
+      })
+    }
+    //this.physics.add.collider(gameState.players, player);
+
+
+
+
+    /*Scoreboard for kills
+    gameState.scoreText = this.add.text(250, 50,'BombsBlown: 0', { fontSize: '15px',
+      fill: '#FFFFFF'})
+    //bombs blow up on crates
+    gameState.bombsBlown = 0;
+    this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
+      bomb.destroy();
+      gameState.bombsBlown += 1;
+      gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
+    });
+    */
+
 
     //const logo = this.add.image(400, 150, 'logo');
     //const bird = this.add.image(200, 450, 'bird');
@@ -171,36 +214,42 @@ export default class GameScene extends Phaser.Scene {
     // player.setBounce(0.2);
     // player.setCollideWorldBounds(true);
 
-
+  createPlayer1(){
     //add players to one group?
     gameState.player1 = this.physics.add.sprite(600, 300, 'bird');
     gameState.player1.setScale(1.5);
     gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
+    gameState.player1.kills = 0;
+    gameState.player1.isDashing = false;
+  }
 
     //gameState.player1 = player1;
     //this.physics.add.collider(gameState.player1, gameState.crates);
-
+  createPlayer2(){
     gameState.player2 = this.physics.add.sprite(150, 300, 'logo');
     gameState.player2.setCollideWorldBounds(true);
     gameState.player2.setScale(.4);
     gameState.player2.setX(400);
-
-    gameState.players = this.physics.add.group();
-
-    // gameState.players.create(gameState.player1);
-    // gameState.players.create(gameState.player2);
-
-    this.physics.add.collider(gameState.player2, gameState.player1, () => {
-      this.add.text(100, 100, 'you are dumb, click to restart!', {fontSize: '40px', fill: '#FFFFFF'});
-      this.stopGame();
-
-      this.input.on('pointerup', () => {
-        this.restartGame();
-      })
-    });
-    //this.physics.add.collider(gameState.players, player);
+    gameState.player2.kills = 0;
+    gameState.player2.isDashing = false;
   }
+
+
+
+  gotBeaked(){
+
+    gameState.scoreText.setText(`BombsBlown: ${gameState.player1.isDashing}`);
+    if (gameState.player1.isDashing){
+        gameState.player2.destroy();
+        gameState.resetPlayer2 = 100;
+    }
+    if (gameState.player2.isDashing){
+        gameState.player1.destroy();
+        gameState.resetPlayer1 = 100;
+    }
+  }
+
 
   //do everything necessary to pause the game
   stopGame(){
@@ -220,47 +269,67 @@ export default class GameScene extends Phaser.Scene {
 
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
-    gameState.player1.setVelocity(0);
+    if (gameState.resetPlayer1 == -1){
+      gameState.player1.setVelocity(0);
 
-    if (gameState.keysPlayer1.left.isDown)
-    {
-        gameState.player1.setVelocityX(-300);
-        gameState.player1.flipX = true;
+      if (gameState.keysPlayer1.left.isDown)
+      {
+          gameState.player1.setVelocityX(-300);
+          gameState.player1.flipX = true;
+      }
+      else if (gameState.keysPlayer1.right.isDown)
+      {
+          gameState.player1.setVelocityX(300);
+          gameState.player1.flipX = false;
+      }
+
+      if (gameState.keysPlayer1.up.isDown)
+      {
+          gameState.player1.setVelocityY(-300);
+      }
+      else if (gameState.keysPlayer1.down.isDown)
+      {
+          gameState.player1.setVelocityY(300);
+      }
     }
-    else if (gameState.keysPlayer1.right.isDown)
-    {
-        gameState.player1.setVelocityX(300);
-        gameState.player1.flipX = false;
+    else if (gameState.resetPlayer1 == 0){
+      gameState.resetPlayer1 = -1;
+      this.createPlayer(true, false);
+    }
+    else{
+      gameState.resetPlayer1 -= 1;
     }
 
-    if (gameState.keysPlayer1.up.isDown)
-    {
-        gameState.player1.setVelocityY(-300);
-    }
-    else if (gameState.keysPlayer1.down.isDown)
-    {
-        gameState.player1.setVelocityY(300);
-    }
+
+
 
     //player2 movement
-    gameState.player2.setVelocity(0);
+    if (gameState.resetPlayer2 == -1){
+      gameState.player2.setVelocity(0);
 
-    if (gameState.keysPlayer2.A.isDown)
-    {
-        gameState.player2.setVelocityX(-300);
-    }
-    else if (gameState.keysPlayer2.D.isDown)
-    {
-        gameState.player2.setVelocityX(300);
-    }
+      if (gameState.keysPlayer2.A.isDown)
+      {
+          gameState.player2.setVelocityX(-300);
+      }
+      else if (gameState.keysPlayer2.D.isDown)
+      {
+          gameState.player2.setVelocityX(300);
+      }
 
-    if (gameState.keysPlayer2.W.isDown)
-    {
-        gameState.player2.setVelocityY(-300);
+      if (gameState.keysPlayer2.W.isDown)
+      {
+          gameState.player2.setVelocityY(-300);
+      }
+      else if (gameState.keysPlayer2.S.isDown)
+      {
+          gameState.player2.setVelocityY(300);
+      }
     }
-    else if (gameState.keysPlayer2.S.isDown)
-    {
-        gameState.player2.setVelocityY(300);
+    else if (gameState.resetPlayer2 == 0){
+      this.createPlayer(false, true);
+    }
+    else {
+      gameState.resetPlayer2 -= 1;
     }
 
     this.specialMovement();
@@ -284,16 +353,21 @@ export default class GameScene extends Phaser.Scene {
   //bug here, dash gets messed up
   specialMovement(){
     let str = '';
+    gameState.dashingVar = false;
     for (var key in gameState.lastKeys) {
+      //not dashing
       if (gameState.lastKeys[key] >= 1) {
         gameState.lastKeys[key] -= 1;
       }
+      //dashing
       else if(gameState.lastKeys[key] <= -1){
         gameState.lastKeys[key] += 1;
+        gameState.dashingVar = true;
         this.move(gameState.lastKeys[key], 3);
       }
       str += key +': ' + gameState.lastKeys[key] + ' ; ';
     }
+    gameState.player1.isDashing = gameState.dashingVar;
 
     gameState.keysText.setText(str);
 
