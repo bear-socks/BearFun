@@ -17,16 +17,16 @@ class Tile {
 
   void display() {
     fill(0);
-    stroke(255, 0, 0);
+    //stroke(255, 0, 0);
     pushMatrix();
     translate(x,y);
     beginShape();
     
         
-    for(int i : verts){
-     print(i + ", "); 
-    }
-    println();
+    //for(int i : verts){
+    // //print(i + ", "); 
+    //}
+    //println();
     
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
@@ -44,20 +44,28 @@ class Tile {
 
     case 0:
       vertex(0, 0);
+      break;
     case 1:
       vertex(0, SIZE / 2);
+      break;
     case 2:
       vertex(0, SIZE);
+      break;
     case 3:
       vertex(SIZE / 2, SIZE);
+      break;
     case 4:
       vertex(SIZE, SIZE);
+      break;
     case 5:
       vertex(SIZE, SIZE / 2);
+      break;
     case 6:
       vertex(SIZE, 0);
+      break;
     case 7:
       vertex(SIZE / 2, 0);
+      break;
     }
 
   }
@@ -65,14 +73,17 @@ class Tile {
   int[] genVerts(float r) {
     int[] verts = new int[8];
     
-    if(r < 0){
+    if(r < 1){
       verts = genVerts(0, 7);
     }
-    else if(r < 10){
-      println("here");
+    else if(r < 2){
+      //println("here");
       int corner = 0;
       int oppositeCorner = (corner + 4) % 8;
       verts = genVerts(corner, oppositeCorner);
+    }
+    else{
+      verts = genVerts(1, (int) random(3, 8));
     }
          
     //for (int i = 0; i < 8; i ++) {
@@ -87,7 +98,7 @@ class Tile {
   int[] genVerts(int start, int finish){
     int[] verts = {0,0,0,0,0,0,0,0};
     
-    for(int i = start; i < finish; i++){
+    for(int i = start; i <= finish; i++){
       verts[i] = 1;
     }   
     
@@ -95,6 +106,7 @@ class Tile {
   }
   
   int[] randomRotation(int[] verts){
+   //rotate(((int) random(4)) * PI / 2);
    return verts; 
   }
 }
