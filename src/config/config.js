@@ -9,9 +9,10 @@ export default {
 	    default: 'arcade',
 	    arcade: {
           //gravity: {y: 0},
-	        debug: true
+	        debug: false
 	    }
 	},
-  backgroundColor: "#320193",
+  //backgroundColor: "#320193",
+  backgroundColor: "#ddd6ce",
   pixelArt: true
 };
