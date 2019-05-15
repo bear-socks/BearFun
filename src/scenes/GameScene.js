@@ -165,13 +165,12 @@ export default class GameScene extends Phaser.Scene {
 	  //calls player create functions
 	  if (p1){
 	    this.createPlayer1()
+      gameState.resetPlayer1 = -1;
 	  }
 	  if (p2){
 	    this.createPlayer2()
+      gameState.resetPlayer2 = -1;
 	  }
-
-	  gameState.resetPlayer1 = -1;
-	  gameState.resetPlayer2 = -1;
 
 	  //gameState.players = this.physics.add.group();
 
@@ -183,7 +182,7 @@ export default class GameScene extends Phaser.Scene {
 	    	this.gotBeaked();
 	 	 })
 	  }
-	 
+
   }
 
 createPlayer1(){
@@ -214,6 +213,14 @@ createPlayer2(){
   this.physics.add.collider(gameState.player2, gameState.crates);
 }
 
+killPlayer(player){
+  // for(var key in gameState.player1.lastKeys){
+  //   key = 0;
+  // }
+  player.lastKeys = {};
+  player.disableInteractive();
+}
+
   gotBeaked(){
   	//maybe it would be easier not to destroy the object but instead make it invisible and uncollidable?
   	//resetting the sprite is mad annoying
@@ -221,11 +228,13 @@ createPlayer2(){
   	//jacob are you using this as a test or is this a mistake? the line below?
     gameState.scoreText.setText(`BombsBlown: ${gameState.player1.isDashing}`);
     if (gameState.player1.isDashing){
-        gameState.player2.destroy();
+        gameState.player2.setVelocity(0);
+        gameState.player2.disableInteractive();
         gameState.resetPlayer2 = 100;
     }
     if (gameState.player2.isDashing){
-        gameState.player1.destroy();
+      gameState.player1.setVelocity(0);
+        gameState.player1.disableInteractive();
         gameState.resetPlayer1 = 100;
     }
   }
@@ -248,7 +257,10 @@ createPlayer2(){
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
     //if reset is -1, player is alive
+    console.log(gameState.resetPlayer1);
+    console.log(gameState.resetPlayer2);
     if (gameState.resetPlayer1 == -1){
+
         gameState.player1.setVelocity(0);
         if(gameState.player1.coolDown == 0){
           this.player1Movement();
@@ -259,7 +271,7 @@ createPlayer2(){
     }
     else if (gameState.resetPlayer1 == 0){
       gameState.resetPlayer1 = -1;
-      this.createPlayer(true, false);
+      this.killPlayer(gameState.player1);
     }
     else{
       gameState.resetPlayer1 -= 1;
@@ -269,6 +281,7 @@ createPlayer2(){
     if (gameState.resetPlayer2 == -1){
     	//this line should only happen when the player2 object comes back but is happening before it does
     	//when both the birds kill each other at the same time
+      //console.log("hi2");
       gameState.player2.setVelocity(0);
       if(gameState.player2.coolDown == 0){
         this.player2Movement();
@@ -279,7 +292,7 @@ createPlayer2(){
     }
     else if (gameState.resetPlayer2 == 0){
       gameState.resetPlayer2 = -1;
-      this.createPlayer(false, true);
+      this.killPlayer(gameState.player2);
     }
     else{
       gameState.resetPlayer2 -= 1;

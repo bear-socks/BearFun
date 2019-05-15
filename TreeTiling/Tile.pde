@@ -17,10 +17,10 @@ class Tile {
 
   void display() {
     fill(0);
-    //if(isSquare()){
-    //  fill(0,0, 255);
-    //}
-    //stroke(255, 0, 0);
+    if(isSquare()){
+      fill(0,0, 255);
+    }
+    stroke(255, 0, 0);
     pushMatrix();
     translate(x, y);
     beginShape();

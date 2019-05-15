@@ -55,8 +55,8 @@ Tile genTile(float x, float y, float r) {
 
 void genSquares() {
   //0 = a full square
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 2; j++) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 5; j += 3) {
       tiles.add(new Tile(320 + i * 32, 320 + 32 * j, SQU));
     }
   }
