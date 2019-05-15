@@ -35,8 +35,8 @@ export default class GameScene extends Phaser.Scene {
 
     //why doesn't this work vvv
     //this.load.image('cardinalR', './assets/logo.png');
-		this.load.image('cardinalR', cardinalRImg);
- 		this.load.image('blueJayR', blueRImg);
+	this.load.image('cardinalR', cardinalRImg);
+ 	this.load.image('blueJayR', blueRImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
@@ -49,6 +49,15 @@ export default class GameScene extends Phaser.Scene {
   create(){
     gameState.keysText = this.add.text(300, 100, '');
 
+    //keyboard stuff
+	  //combine these into one or no?, might mess things up if I do
+	  //player 1 keys
+	  gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+	  //used in special movement (for dash attacking)
+
+	  //player 2 keys
+	  gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+
 
     //load music
     //.wav file did not work for this, think I need something more in the package for that
@@ -58,8 +67,8 @@ export default class GameScene extends Phaser.Scene {
     //adding text
     this.add.text(50, 50, 'will like poop');
 
-    this.createPlayer();
     this.createWorld();
+    this.createPlayer();
 
     //how to click on stuff
     //has weird bounds that are bigger than the actual picture
@@ -114,8 +123,6 @@ export default class GameScene extends Phaser.Scene {
 
     genCrate();
 
-    this.physics.add.collider(gameState.player1, gameState.crates);
-    this.physics.add.collider(gameState.player2, gameState.crates);
     //not sure if this causes problems or not
     this.physics.add.collider(gameState.crates, gameState.crates);
   }
@@ -149,70 +156,69 @@ export default class GameScene extends Phaser.Scene {
       gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
     });
 
-    this.physics.add.collider(gameState.player1, gameState.bombs);
-    this.physics.add.collider(gameState.player2, gameState.bombs);
     this.physics.add.collider(gameState.bombs, gameState.bombs);
   }
 
+  //called after a player is killed on a respawn
   createPlayer(p1 = true, p2 = true){
 
+	  //calls player create functions
+	  if (p1){
+	    this.createPlayer1()
+	  }
+	  if (p2){
+	    this.createPlayer2()
+	  }
 
-//keyboard stuff
-  //combine these into one or no?, might mess things up if I do
-  //player 1 keys
-  gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
-  //used in special movement (for dash attacking)
+	  gameState.resetPlayer1 = -1;
+	  gameState.resetPlayer2 = -1;
 
-  //player 2 keys
-  gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+	  //gameState.players = this.physics.add.group();
 
-  //calls player create functions
-  if (p1){
-    this.createPlayer1()
-  }
-  if (p2){
-    this.createPlayer2()
-  }
+	  // gameState.players.create(gameState.player1);
+	  // gameState.players.create(gameState.player2);
 
-  gameState.resetPlayer1 = -1;
-  gameState.resetPlayer2 = -1;
-
-  //gameState.players = this.physics.add.group();
-
-  // gameState.players.create(gameState.player1);
-  // gameState.players.create(gameState.player2);
-
-  this.physics.add.collider(gameState.player2, gameState.player1, () => {
-    this.gotBeaked();
-    })
+	  if(!(gameState.player1 === null || gameState.player2 === null)){
+	  	 this.physics.add.collider(gameState.player2, gameState.player1, () => {
+	    	this.gotBeaked();
+	 	 })
+	  }
+	 
   }
 
 createPlayer1(){
   //add players to one group?
-  gameState.player1 = this.physics.add.sprite(800, 300, 'blueJayR');
+  gameState.player1 = this.physics.add.sprite(900, 300, 'blueJayR');
   gameState.player1.setScale(1.5);
   gameState.player1.setBounce(.2);
   gameState.player1.setCollideWorldBounds(true);
   gameState.player1.isDashing = false;
   gameState.player1.coolDown = 0;
   gameState.player1.lastKeys = {};
+  this.physics.add.collider(gameState.player1, gameState.bombs);
+  this.physics.add.collider(gameState.player1, gameState.crates);
+
 }
 
   //gameState.player1 = player1;
   //this.physics.add.collider(gameState.player1, gameState.crates);
 createPlayer2(){
-  gameState.player2 = this.physics.add.sprite(100, 300, 'cardinalR');
+  gameState.player2 = this.physics.add.sprite(300, 300, 'cardinalR');
   gameState.player2.setCollideWorldBounds(true);
   gameState.player2.setScale(1.5);
   gameState.player2.setBounce(.2);
-  gameState.player2.setX(400);
   gameState.player2.isDashing = false;
   gameState.player2.coolDown = 0;
   gameState.player2.lastKeys = {};
+  this.physics.add.collider(gameState.player2, gameState.bombs);
+  this.physics.add.collider(gameState.player2, gameState.crates);
 }
 
   gotBeaked(){
+  	//maybe it would be easier not to destroy the object but instead make it invisible and uncollidable?
+  	//resetting the sprite is mad annoying
 
+  	//jacob are you using this as a test or is this a mistake? the line below?
     gameState.scoreText.setText(`BombsBlown: ${gameState.player1.isDashing}`);
     if (gameState.player1.isDashing){
         gameState.player2.destroy();
@@ -261,6 +267,8 @@ createPlayer2(){
 
     //player2 movement
     if (gameState.resetPlayer2 == -1){
+    	//this line should only happen when the player2 object comes back but is happening before it does
+    	//when both the birds kill each other at the same time
       gameState.player2.setVelocity(0);
       if(gameState.player2.coolDown == 0){
         this.player2Movement();
@@ -299,9 +307,7 @@ createPlayer2(){
       {
           gameState.player1.setVelocityY(300);
       }
-
-
-    this.specialMovement1();
+		this.specialMovement1();
     }
 
   player2Movement(){

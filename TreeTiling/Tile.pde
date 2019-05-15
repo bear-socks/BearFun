@@ -17,17 +17,20 @@ class Tile {
 
   void display() {
     fill(0);
+    //if(isSquare()){
+    //  fill(0,0, 255);
+    //}
     //stroke(255, 0, 0);
     pushMatrix();
-    translate(x,y);
+    translate(x, y);
     beginShape();
-    
-        
+
+
     //for(int i : verts){
     // //print(i + ", "); 
     //}
     //println();
-    
+
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
       if (verts[i] == 1) {
@@ -67,55 +70,118 @@ class Tile {
       vertex(SIZE / 2, 0);
       break;
     }
-
   }
 
   int[] genVerts(float r) {
     int[] verts = new int[8];
-    
-    if(r < 1){
+
+    //square
+    if (r == 0) {
       verts = genVerts(0, 7);
+    } else {
+      int add = (int) random(1, 3);
+      int add2 = (int) random(2);
+      if (add == add2) {
+        //add += 1;
+      }
+      if (random(1) < .5) {
+        verts = genVerts(4-add2, 6 + add);
+      } else {
+        verts = genVerts(4 - add, 6 + add2 );
+      }
+
+      //println(r);
+
+      //right side whole
+      if (r == 1) {
+      } 
+      //left side whole
+      else if (r == 2) {
+        verts = rotation(verts, 4);
+      } 
+      //bottom side whole 
+      else if (r == 3) {
+        verts = rotation(verts, 6);
+      } 
+      //top side whole
+      else if (r == 4) {
+        verts = rotation(verts, 2);
+      }
     }
-    else if(r < 2){
-      //println("here");
-      int corner = 0;
-      int oppositeCorner = (corner + 4) % 8;
-      verts = genVerts(corner, oppositeCorner);
-    }
-    else{
-      verts = genVerts(1, (int) random(3, 8));
-    }
-         
-    //for (int i = 0; i < 8; i ++) {
-    //  sides[i] =
-    //}
-    
-    verts = randomRotation(verts);
+
+
+    //verts = randomRotation(verts);
 
     return verts;
   }
-  
-  int[] genVerts(int start, int finish){
-    int[] verts = {0,0,0,0,0,0,0,0};
-    
-    for(int i = start; i <= finish; i++){
-      verts[i] = 1;
+
+  int[] genVerts(int start, int finish) {
+    int[] verts = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    for (int i = start; i <= finish; i++) {
+      verts[i % 8] = 1;
     }   
-    
+
     return verts;
   }
-  
-  int[] randomRotation(int[] verts){
-   //rotate(((int) random(4)) * PI / 2);
-   return verts; 
+
+  int[] rotation(int[] verts, int r) {
+    int[] nVert = new int[8];
+    for (int i = r; i < r + nVert.length; i++) {
+      nVert[i % nVert.length] = verts[i - r];
+    }
+    return nVert;
   }
-  
-  boolean isSquare(){
-   for(int n : verts){
-     if(n == 0){
-       return false;
-     }
-   }
-   return true;
+
+  int[] randomRotation(int[] verts) {
+    //rotate(((int) random(4)) * PI / 2);
+    return verts;
+  }
+
+  boolean isSquare() {
+    for (int n : verts) {
+      //print(n);
+      if (n == 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  //0 = left, 1 = right, 2 = top, 3 = bottom
+  void matchTile(Tile[] tileArr) {
+    for (int i = 0; i < 4; i++) {
+      Tile adjT = tileArr[i];
+      if (adjT != null) {
+        //not sure about i == 0
+        if(i == 0){
+          //matching up this particular side
+          for(int n = 4; n <= 6; n++){
+            verts[6 - n % 8] = adjT.verts[n % 8];
+          }
+        }
+        else if(i == 1){
+          for(int n = 4; n <= 6; n++){
+            verts[n] = adjT.verts[6 - n % 8];
+          }
+          //for(int q = 0; q <= 2; q++){
+          //  println(verts[q] == adjT.verts[6 - q]);
+          //}
+          //verts = genVerts(0, 8);
+        }
+        else if(i == 2){
+          for(int n = 6; n <= 8; n++){
+            verts[n % 8] = adjT.verts[(10 - n) % 8];
+          }
+        }
+        else if(i == 3){
+          for(int n = 6; n <= 8; n++){
+            verts[(10 - n) % 8] = adjT.verts[n % 8];
+          }
+        }
+        println(i);
+      }
+      //println(tileArr[i]);
+    }
   }
 }
