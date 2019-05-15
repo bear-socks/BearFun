@@ -183,7 +183,7 @@ export default class GameScene extends Phaser.Scene {
 
   createPlayer1(){
     //add players to one group?
-    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJay', 'blueJayLeft.png');
+    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJay');
     this.anims.create({
       key: 'movementLeft',
       frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 1 }),
@@ -200,13 +200,13 @@ export default class GameScene extends Phaser.Scene {
       key: 'standLeft',
       frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 0 }),
       frameRate: 10,
-      repeat: 1
+      repeat: -1
     });
     this.anims.create({
       key: 'standRight',
       frames: this.anims.generateFrameNumbers('blueJay', { start: 2, end: 2 }),
       frameRate: 10,
-      repeat: 1
+      repeat: -1
     });
     gameState.player1.setScale(1.5);
     gameState.player1.setBounce(.2);
@@ -214,8 +214,9 @@ export default class GameScene extends Phaser.Scene {
     gameState.player1.isDashing = false;
     gameState.player1.coolDown = 0;
     gameState.player1.lastKeys = {};
-    // this.physics.add.collider(gameState.player1, gameState.bombs);
-    // this.physics.add.collider(gameState.player1, gameState.crates);
+    gameState.player1.directionX = 'Left';
+    this.physics.add.collider(gameState.player1, gameState.bombs);
+    this.physics.add.collider(gameState.player1, gameState.crates);
 
   }
 
@@ -363,34 +364,43 @@ export default class GameScene extends Phaser.Scene {
   }
   player1Movement(){
 
+    gameState.player1.movingY = false;
+
+    if (gameState.keysPlayer1.up.isDown)
+    {
+      gameState.player1.setVelocityY(-300);
+      gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
+      gameState.player1.movingY = true;
+
+    }
+    else if (gameState.keysPlayer1.down.isDown)
+    {
+      gameState.player1.setVelocityY(300);
+      gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
+      gameState.player1.movingY = true;
+    }
+
     if (gameState.keysPlayer1.left.isDown)
     {
       gameState.player1.anims.play('movementLeft', true);
       gameState.player1.setVelocityX(-300);
-      gameState.player1.directionX = 'left';
+      gameState.player1.directionX = 'Left';
     }
     else if (gameState.keysPlayer1.right.isDown)
     {
       gameState.player1.anims.play('movementRight', true);
       gameState.player1.setVelocityX(300);
-      gameState.player1.directionX = 'right';
+      gameState.player1.directionX = 'Right';
     }
-    else if (gameState.player1.directionX == 'left'){
+    else if (!gameState.player1.movingY && gameState.player1.directionX == 'Left'){
       gameState.player1.anims.play('standLeft', true);
     }
-    else {
+    else if(!gameState.player1.movingY){
       gameState.player1.anims.play('standRight', true);
     }
 
 
-    if (gameState.keysPlayer1.up.isDown)
-    {
-      gameState.player1.setVelocityY(-300);
-    }
-    else if (gameState.keysPlayer1.down.isDown)
-    {
-      gameState.player1.setVelocityY(300);
-    }
+
     this.specialMovement1();
   }
 
@@ -498,6 +508,7 @@ export default class GameScene extends Phaser.Scene {
         this.move(lKeys[key], 3);
         gameState.dashingVar = true;
         if(lKeys[key] == -1){
+          gameState.dashingVar = false;
           this.setCoolDown(lKeys[key]);
         }
         lKeys[key] += 1;
