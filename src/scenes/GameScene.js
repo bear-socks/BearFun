@@ -60,53 +60,45 @@ export default class GameScene extends Phaser.Scene {
     //player 2 keys
     gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
-
-    //load music
-    //.wav file did not work for this, think I need something more in the package for that
-    //gameState.music = this.sound.add('theme');
-    //gameState.music.play();
-
-    //adding text
-    this.add.text(50, 50, 'will like poop');
+    //this.add.text(50, 50, 'will like poop');
 
     this.createWorld();
     this.createPlayer();
 
     //how to click on stuff
-    //has weird bounds that are bigger than the actual picture
-    gameState.clickCrate = this.add.sprite(800, 100, 'crate');
-    gameState.clickCrate.setInteractive();
-    gameState.clickCrate.on('pointerup', function(){
-      this.x -= 20;
-    });
+    // gameState.clickCrate = this.add.sprite(800, 100, 'crate');
+    // gameState.clickCrate.setInteractive();
+    // gameState.clickCrate.on('pointerup', function(){
+    //   this.x -= 20;
+    // });
 
     //https://www.youtube.com/watch?v=sYleQ1uRmjk
-    this.items = this.add.group([
-      {
-        key: 'crate',
-        setXY:{
-          x: 100,
-          y: 240
-        }
-      },
-      {
-        key: 'tree',
-        setXY:{
-          x: 600,
-          y: 440
-        }
-      }
-    ]);
+    // this.items = this.add.group([
+    //   {
+    //     key: 'crate',
+    //     setXY:{
+    //       x: 100,
+    //       y: 240
+    //     }
+    //   },
+    //   {
+    //     key: 'tree',
+    //     setXY:{
+    //       x: 600,
+    //       y: 440
+    //     }
+    //   }
+    // ]);
     //things have depth 0 by default
     //giving these pictures depth 1 makes them above the players
-    this.items.setDepth(1);
+    // this.items.setDepth(1);
 
   }
 
   createWorld(){
 
-    this.genCrates();
-    this.genBombs();
+    //this.genCrates();
+    //this.genBombs();
 
   }
 
@@ -155,13 +147,13 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
       bomb.destroy();
       gameState.bombsBlown += 1;
-      gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
+      //gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
     });
 
     this.physics.add.collider(gameState.bombs, gameState.bombs);
   }
 
-  //called after a player is killed on a respawn
+  //called once
   createPlayer(p1 = true, p2 = true){
 
     //calls player create functions
@@ -184,6 +176,8 @@ export default class GameScene extends Phaser.Scene {
         this.gotBeaked();
       })
     }
+
+    this.createPlayerText();
 
   }
 
@@ -239,32 +233,74 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(gameState.player2, gameState.crates);
   }
 
-  killPlayer(player){
+  createPlayerText(){
+    gameState.player1.score = 0;
+    gameState.player1.scoreText = this.add.text(1050, 100, '0', { fontSize: '45px',
+    fill: '#FFFFFF'});
+    //score goes in front of players
+    gameState.player1.scoreText.setDepth(1);
+
+    gameState.player2.score = 0;
+    gameState.player2.scoreText = this.add.text(100, 100, '0', { fontSize: '45px',
+    fill: '#FFFFFF'});
+    //score goes in front of players
+    gameState.player2.scoreText.setDepth(1);
+  }
+
+  respawn(player){
     // for(var key in gameState.player1.lastKeys){
     //   key = 0;
     // }
     player.lastKeys = {};
-    player.disableInteractive();
+    player.setCollideWorldBounds(true);
+    if(player == gameState.player1){
+      player.setPosition(1050, 300);
+    }
+    else if(player == gameState.player2){
+      player.setPosition(150, 300);
+    }
+
+    //player.disableInteractive();
+  }
+
+  getOtherPlayer(player){
+    if(player == gameState.player1){
+      return gameState.player2;
+    }
+    else{
+      return gameState.player1;
+    }
   }
 
   gotBeaked(){
-    //maybe it would be easier not to destroy the object but instead make it invisible and uncollidable?
-    //resetting the sprite is mad annoying
-
-    //jacob are you using this as a test or is this a mistake? the line below?
-    gameState.scoreText.setText(`BombsBlown: ${gameState.player1.isDashing}`);
     if (gameState.player1.isDashing){
+      //stops the dash
+      gameState.player1.lastKeys = {};
       gameState.player2.setVelocity(0);
+      this.addScore(gameState.player1, 1);
       gameState.player2.disableInteractive();
       gameState.resetPlayer2 = 100;
+
+      gameState.player2.setCollideWorldBounds(false);
+      gameState.player2.setPosition(-1000, 0);
     }
     if (gameState.player2.isDashing){
+      gameState.player2.lastKeys = {};
       gameState.player1.setVelocity(0);
+      this.addScore(gameState.player2, 1);
       gameState.player1.disableInteractive();
       gameState.resetPlayer1 = 100;
+
+      //just move them off the map
+      gameState.player1.setCollideWorldBounds(false);
+      gameState.player1.setPosition(-1200, 0);
     }
   }
 
+  addScore(player, num){
+    player.score += num;
+    player.scoreText.setText(`${player.score}`);
+  }
 
   //do everything necessary to pause the game
   stopGame(){
@@ -297,7 +333,7 @@ export default class GameScene extends Phaser.Scene {
     }
     else if (gameState.resetPlayer1 == 0){
       gameState.resetPlayer1 = -1;
-      this.killPlayer(gameState.player1);
+      this.respawn(gameState.player1);
     }
     else{
       gameState.resetPlayer1 -= 1;
@@ -318,7 +354,7 @@ export default class GameScene extends Phaser.Scene {
     }
     else if (gameState.resetPlayer2 == 0){
       gameState.resetPlayer2 = -1;
-      this.killPlayer(gameState.player2);
+      this.respawn(gameState.player2);
     }
     else{
       gameState.resetPlayer2 -= 1;
@@ -471,7 +507,7 @@ export default class GameScene extends Phaser.Scene {
     player.isDashing = gameState.dashingVar;
 
     //doesn't show up for player1, because player2 happens second in the same frame
-    gameState.keysText.setText(str);
+    //gameState.keysText.setText(str);
 
   }
 
