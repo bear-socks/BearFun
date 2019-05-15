@@ -1,15 +1,15 @@
 
 class Tile {
-  float x, y;
+  int x, y;
   //collection of 8 points to represent if each point is connected or not
   int[] verts;
-  public Tile(float x_, float y_, int[] verts_) {
+  public Tile(int x_, int y_, int[] verts_) {
     x = x_;
     y = y_;
     verts = verts_;
   }
 
-  public Tile(float x_, float y_, float sideNum) {
+  public Tile(int x_, int y_, float sideNum) {
     x = x_;
     y = y_;
     verts = genVerts(sideNum);
@@ -17,10 +17,10 @@ class Tile {
 
   void display() {
     fill(0);
-    if(isSquare()){
-      fill(0,0, 255);
-    }
-    stroke(255, 0, 0);
+    //if(isSquare()){
+    //  fill(0,0, 255);
+    //}
+    //stroke(255, 0, 0);
     pushMatrix();
     translate(x, y);
     beginShape();
@@ -75,8 +75,13 @@ class Tile {
   int[] genVerts(float r) {
     int[] verts = new int[8];
 
+    
+    if(r == -1){
+      //corner piece
+      verts = genVerts(0, -1);
+    }
     //square
-    if (r == 0) {
+    else if (r == 0) {
       verts = genVerts(0, 7);
     } else {
       int add = (int) random(1, 3);
@@ -179,7 +184,7 @@ class Tile {
             verts[(10 - n) % 8] = adjT.verts[n % 8];
           }
         }
-        println(i);
+        //println(i);
       }
       //println(tileArr[i]);
     }
