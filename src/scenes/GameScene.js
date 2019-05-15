@@ -21,7 +21,7 @@ var gameState = {};
 // var player2;
 
 
-  //var player;
+//var player;
 
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
@@ -35,8 +35,8 @@ export default class GameScene extends Phaser.Scene {
 
     //why doesn't this work vvv
     //this.load.image('cardinalR', './assets/logo.png');
-	this.load.image('cardinalR', cardinalRImg);
- 	this.load.image('blueJayR', blueRImg);
+    this.load.image('cardinalR', cardinalRImg);
+    this.load.image('blueJayR', blueRImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
@@ -50,13 +50,13 @@ export default class GameScene extends Phaser.Scene {
     gameState.keysText = this.add.text(300, 100, '');
 
     //keyboard stuff
-	  //combine these into one or no?, might mess things up if I do
-	  //player 1 keys
-	  gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
-	  //used in special movement (for dash attacking)
+    //combine these into one or no?, might mess things up if I do
+    //player 1 keys
+    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+    //used in special movement (for dash attacking)
 
-	  //player 2 keys
-	  gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
+    //player 2 keys
+    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
 
     //load music
@@ -147,7 +147,7 @@ export default class GameScene extends Phaser.Scene {
 
     //text for numBombs
     gameState.scoreText = this.add.text(250, 50,'BombsBlown: 0', { fontSize: '15px',
-      fill: '#FFFFFF'})
+    fill: '#FFFFFF'})
     //bombs blow up on crates
     gameState.bombsBlown = 0;
     this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
@@ -162,90 +162,90 @@ export default class GameScene extends Phaser.Scene {
   //called after a player is killed on a respawn
   createPlayer(p1 = true, p2 = true){
 
-	  //calls player create functions
-	  if (p1){
-	    this.createPlayer1()
+    //calls player create functions
+    if (p1){
+      this.createPlayer1()
       gameState.resetPlayer1 = -1;
-	  }
-	  if (p2){
-	    this.createPlayer2()
+    }
+    if (p2){
+      this.createPlayer2()
       gameState.resetPlayer2 = -1;
-	  }
+    }
 
-	  //gameState.players = this.physics.add.group();
+    //gameState.players = this.physics.add.group();
 
-	  // gameState.players.create(gameState.player1);
-	  // gameState.players.create(gameState.player2);
+    // gameState.players.create(gameState.player1);
+    // gameState.players.create(gameState.player2);
 
-	  if(!(gameState.player1 === null || gameState.player2 === null)){
-	  	 this.physics.add.collider(gameState.player2, gameState.player1, () => {
-	    	this.gotBeaked();
-	 	 })
-	  }
+    if(!(gameState.player1 === null || gameState.player2 === null)){
+      this.physics.add.collider(gameState.player2, gameState.player1, () => {
+        this.gotBeaked();
+      })
+    }
 
   }
 
-createPlayer1(){
-  //add players to one group?
-  gameState.player1 = this.physics.add.sprite(900, 300, 'blueJayR');
-  gameState.player1.setScale(1.5);
-  gameState.player1.setBounce(.2);
-  gameState.player1.setCollideWorldBounds(true);
-  gameState.player1.isDashing = false;
-  gameState.player1.coolDown = 0;
-  gameState.player1.lastKeys = {};
-  this.physics.add.collider(gameState.player1, gameState.bombs);
-  this.physics.add.collider(gameState.player1, gameState.crates);
+  createPlayer1(){
+    //add players to one group?
+    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJayR');
+    gameState.player1.setScale(1.5);
+    gameState.player1.setBounce(.2);
+    gameState.player1.setCollideWorldBounds(true);
+    gameState.player1.isDashing = false;
+    gameState.player1.coolDown = 0;
+    gameState.player1.lastKeys = {};
+    this.physics.add.collider(gameState.player1, gameState.bombs);
+    this.physics.add.collider(gameState.player1, gameState.crates);
 
-}
+  }
 
   //gameState.player1 = player1;
   //this.physics.add.collider(gameState.player1, gameState.crates);
-createPlayer2(){
-  gameState.player2 = this.physics.add.sprite(300, 300, 'cardinalR');
-  gameState.player2.setCollideWorldBounds(true);
-  gameState.player2.setScale(1.5);
-  gameState.player2.setBounce(.2);
-  gameState.player2.isDashing = false;
-  gameState.player2.coolDown = 0;
-  gameState.player2.lastKeys = {};
-  this.physics.add.collider(gameState.player2, gameState.bombs);
-  this.physics.add.collider(gameState.player2, gameState.crates);
-}
+  createPlayer2(){
+    gameState.player2 = this.physics.add.sprite(300, 300, 'cardinalR');
+    gameState.player2.setCollideWorldBounds(true);
+    gameState.player2.setScale(1.5);
+    gameState.player2.setBounce(.2);
+    gameState.player2.isDashing = false;
+    gameState.player2.coolDown = 0;
+    gameState.player2.lastKeys = {};
+    this.physics.add.collider(gameState.player2, gameState.bombs);
+    this.physics.add.collider(gameState.player2, gameState.crates);
+  }
 
-killPlayer(player){
-  // for(var key in gameState.player1.lastKeys){
-  //   key = 0;
-  // }
-  player.lastKeys = {};
-  player.disableInteractive();
-}
+  killPlayer(player){
+    // for(var key in gameState.player1.lastKeys){
+    //   key = 0;
+    // }
+    player.lastKeys = {};
+    player.disableInteractive();
+  }
 
   gotBeaked(){
-  	//maybe it would be easier not to destroy the object but instead make it invisible and uncollidable?
-  	//resetting the sprite is mad annoying
+    //maybe it would be easier not to destroy the object but instead make it invisible and uncollidable?
+    //resetting the sprite is mad annoying
 
-  	//jacob are you using this as a test or is this a mistake? the line below?
+    //jacob are you using this as a test or is this a mistake? the line below?
     gameState.scoreText.setText(`BombsBlown: ${gameState.player1.isDashing}`);
     if (gameState.player1.isDashing){
-        gameState.player2.setVelocity(0);
-        gameState.player2.disableInteractive();
-        gameState.resetPlayer2 = 100;
+      gameState.player2.setVelocity(0);
+      gameState.player2.disableInteractive();
+      gameState.resetPlayer2 = 100;
     }
     if (gameState.player2.isDashing){
       gameState.player1.setVelocity(0);
-        gameState.player1.disableInteractive();
-        gameState.resetPlayer1 = 100;
+      gameState.player1.disableInteractive();
+      gameState.resetPlayer1 = 100;
     }
   }
 
 
   //do everything necessary to pause the game
   stopGame(){
-      //stop generating bombs
-      gameState.bombGenLoop.destroy();
-      //stop physics
-      this.physics.pause();
+    //stop generating bombs
+    gameState.bombGenLoop.destroy();
+    //stop physics
+    this.physics.pause();
   }
 
   //do everything necessary to restart the game
@@ -261,13 +261,13 @@ killPlayer(player){
     console.log(gameState.resetPlayer2);
     if (gameState.resetPlayer1 == -1){
 
-        gameState.player1.setVelocity(0);
-        if(gameState.player1.coolDown == 0){
-          this.player1Movement();
-        }
-        else{
-          gameState.player1.coolDown -= 1;
-        }
+      gameState.player1.setVelocity(0);
+      if(gameState.player1.coolDown == 0){
+        this.player1Movement();
+      }
+      else{
+        gameState.player1.coolDown -= 1;
+      }
     }
     else if (gameState.resetPlayer1 == 0){
       gameState.resetPlayer1 = -1;
@@ -279,8 +279,8 @@ killPlayer(player){
 
     //player2 movement
     if (gameState.resetPlayer2 == -1){
-    	//this line should only happen when the player2 object comes back but is happening before it does
-    	//when both the birds kill each other at the same time
+      //this line should only happen when the player2 object comes back but is happening before it does
+      //when both the birds kill each other at the same time
       //console.log("hi2");
       gameState.player2.setVelocity(0);
       if(gameState.player2.coolDown == 0){
@@ -297,53 +297,53 @@ killPlayer(player){
     else{
       gameState.resetPlayer2 -= 1;
 
+    }
   }
-}
   player1Movement(){
 
-      if (gameState.keysPlayer1.left.isDown)
-      {
-          gameState.player1.setVelocityX(-300);
-          gameState.player1.flipX = true;
-      }
-      else if (gameState.keysPlayer1.right.isDown)
-      {
-          gameState.player1.setVelocityX(300);
-          gameState.player1.flipX = false;
-      }
-
-      if (gameState.keysPlayer1.up.isDown)
-      {
-          gameState.player1.setVelocityY(-300);
-      }
-      else if (gameState.keysPlayer1.down.isDown)
-      {
-          gameState.player1.setVelocityY(300);
-      }
-		this.specialMovement1();
+    if (gameState.keysPlayer1.left.isDown)
+    {
+      gameState.player1.setVelocityX(-300);
+      gameState.player1.flipX = true;
+    }
+    else if (gameState.keysPlayer1.right.isDown)
+    {
+      gameState.player1.setVelocityX(300);
+      gameState.player1.flipX = false;
     }
 
+    if (gameState.keysPlayer1.up.isDown)
+    {
+      gameState.player1.setVelocityY(-300);
+    }
+    else if (gameState.keysPlayer1.down.isDown)
+    {
+      gameState.player1.setVelocityY(300);
+    }
+    this.specialMovement1();
+  }
+
   player2Movement(){
-      //player2 movement
+    //player2 movement
 
-      if (gameState.keysPlayer2.A.isDown)
-      {
-          gameState.player2.setVelocityX(-300);
-      }
-      else if (gameState.keysPlayer2.D.isDown)
-      {
-          gameState.player2.setVelocityX(300);
-      }
+    if (gameState.keysPlayer2.A.isDown)
+    {
+      gameState.player2.setVelocityX(-300);
+    }
+    else if (gameState.keysPlayer2.D.isDown)
+    {
+      gameState.player2.setVelocityX(300);
+    }
 
-      if (gameState.keysPlayer2.W.isDown)
-      {
-          gameState.player2.setVelocityY(-300);
-      }
-      else if (gameState.keysPlayer2.S.isDown)
-      {
-          gameState.player2.setVelocityY(300);
-      }
-      this.specialMovement2();
+    if (gameState.keysPlayer2.W.isDown)
+    {
+      gameState.player2.setVelocityY(-300);
+    }
+    else if (gameState.keysPlayer2.S.isDown)
+    {
+      gameState.player2.setVelocityY(300);
+    }
+    this.specialMovement2();
   }
 
   //I think this is where the dashing problem is
@@ -378,39 +378,39 @@ killPlayer(player){
   }
 
   specialMovement1(){
-      this.specialMovement(gameState.player1.lastKeys, gameState.player1);
+    this.specialMovement(gameState.player1.lastKeys, gameState.player1);
 
-      if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
-        //could I send this in as a pointer instead of an int value?
-        gameState.player1.lastKeys.left = this.specialMovementKeyVal(gameState.player1.lastKeys.left);
-      }
-      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
-        gameState.player1.lastKeys.right = this.specialMovementKeyVal(gameState.player1.lastKeys.right);
-      }
-      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
-        gameState.player1.lastKeys.up = this.specialMovementKeyVal(gameState.player1.lastKeys.up);
-      }
-      if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
-        gameState.player1.lastKeys.down = this.specialMovementKeyVal(gameState.player1.lastKeys.down);
-      }
+    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
+      //could I send this in as a pointer instead of an int value?
+      gameState.player1.lastKeys.left = this.specialMovementKeyVal(gameState.player1.lastKeys.left);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
+      gameState.player1.lastKeys.right = this.specialMovementKeyVal(gameState.player1.lastKeys.right);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
+      gameState.player1.lastKeys.up = this.specialMovementKeyVal(gameState.player1.lastKeys.up);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
+      gameState.player1.lastKeys.down = this.specialMovementKeyVal(gameState.player1.lastKeys.down);
+    }
   }
 
   specialMovement2(){
-        this.specialMovement(gameState.player2.lastKeys, gameState.player2);
-        //player 2
-        if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
-          //could I send this in as a pointer instead of an int value?
-          gameState.player2.lastKeys.A = this.specialMovementKeyVal(gameState.player2.lastKeys.A);
-        }
-        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
-          gameState.player2.lastKeys.D = this.specialMovementKeyVal(gameState.player2.lastKeys.D);
-        }
-        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
-          gameState.player2.lastKeys.W = this.specialMovementKeyVal(gameState.player2.lastKeys.W);
-        }
-        if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
-          gameState.player2.lastKeys.S = this.specialMovementKeyVal(gameState.player2.lastKeys.S);
-        }
+    this.specialMovement(gameState.player2.lastKeys, gameState.player2);
+    //player 2
+    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
+      //could I send this in as a pointer instead of an int value?
+      gameState.player2.lastKeys.A = this.specialMovementKeyVal(gameState.player2.lastKeys.A);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
+      gameState.player2.lastKeys.D = this.specialMovementKeyVal(gameState.player2.lastKeys.D);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
+      gameState.player2.lastKeys.W = this.specialMovementKeyVal(gameState.player2.lastKeys.W);
+    }
+    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
+      gameState.player2.lastKeys.S = this.specialMovementKeyVal(gameState.player2.lastKeys.S);
+    }
   }
 
   //lKeys is a lastKeys object
@@ -448,23 +448,23 @@ killPlayer(player){
       gameState.player1.lastKeys.up == key ||
       gameState.player1.lastKeys.down == key){
         gameState.player1.coolDown = 30;
-    }
-    else if(gameState.player2.lastKeys.A == key ||
-      gameState.player2.lastKeys.D == key ||
-      gameState.player2.lastKeys.W == key ||
-      gameState.player2.lastKeys.S == key){
-        gameState.player2.coolDown = 30;
-    }
-  }
-
-  specialMovementKeyVal(key){
-    if(key > 0){
-        //gameState.player1.setVelocityX(-2400);
-        return -15;
       }
-      else{
-        return 12;
+      else if(gameState.player2.lastKeys.A == key ||
+        gameState.player2.lastKeys.D == key ||
+        gameState.player2.lastKeys.W == key ||
+        gameState.player2.lastKeys.S == key){
+          gameState.player2.coolDown = 30;
+        }
       }
-  }
 
-}
+      specialMovementKeyVal(key){
+        if(key > 0){
+          //gameState.player1.setVelocityX(-2400);
+          return -15;
+        }
+        else{
+          return 12;
+        }
+      }
+
+    }
