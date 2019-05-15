@@ -1,0 +1,125 @@
+{
+	"textures": [
+		{
+			"image": "blueJay.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 115,
+				"h": 32
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "blueJayLeft.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 23,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					}
+				},
+				{
+					"filename": "blueJayLeftStep.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 23,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					},
+					"frame": {
+						"x": 23,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					}
+				},
+				{
+					"filename": "blueJayRight.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 23,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					},
+					"frame": {
+						"x": 46,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					}
+				},
+				{
+					"filename": "blueJayRightStep.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 23,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					},
+					"frame": {
+						"x": 69,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					}
+				},
+				{
+					"filename": "deadBlueJay.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 23,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					},
+					"frame": {
+						"x": 92,
+						"y": 0,
+						"w": 23,
+						"h": 32
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:5d99c9065f4b0196866697078c574029:6b2b04b61a1e3e9df739dea9b0821ad3:89a85a6ccd88d54340e141f6f393b4dd$"
+	}
+}

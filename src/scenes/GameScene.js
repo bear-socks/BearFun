@@ -2,8 +2,9 @@ import 'phaser';
 
 //i've seen better ways to do this but can't figure it out
 import cardinalRImg from './assets/cardinalRight.png';
-import blueRImg from './assets/blueJayRight.png';
+//import blueRImg from './assets/blueJayRight.png';
 //import birdLImg from './assets/blueJayLeft.png';
+import blueJay from './assets/blueJay.png'
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
@@ -36,7 +37,8 @@ export default class GameScene extends Phaser.Scene {
     //why doesn't this work vvv
     //this.load.image('cardinalR', './assets/logo.png');
     this.load.image('cardinalR', cardinalRImg);
-    this.load.image('blueJayR', blueRImg);
+    this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
+    //this.load.image('blueJayR', blueRImg);
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
@@ -187,7 +189,31 @@ export default class GameScene extends Phaser.Scene {
 
   createPlayer1(){
     //add players to one group?
-    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJayR');
+    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJay', 'blueJayLeft.png');
+    this.anims.create({
+      key: 'movementLeft',
+      frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 1 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'movementRight',
+      frames: this.anims.generateFrameNumbers('blueJay', { start: 2, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'standLeft',
+      frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 0 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.anims.create({
+      key: 'standRight',
+      frames: this.anims.generateFrameNumbers('blueJay', { start: 2, end: 2 }),
+      frameRate: 10,
+      repeat: 1
+    });
     gameState.player1.setScale(1.5);
     gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
@@ -303,14 +329,23 @@ export default class GameScene extends Phaser.Scene {
 
     if (gameState.keysPlayer1.left.isDown)
     {
+      gameState.player1.anims.play('movementLeft', true);
       gameState.player1.setVelocityX(-300);
-      gameState.player1.flipX = true;
+      gameState.player1.directionX = 'left';
     }
     else if (gameState.keysPlayer1.right.isDown)
     {
+      gameState.player1.anims.play('movementRight', true);
       gameState.player1.setVelocityX(300);
-      gameState.player1.flipX = false;
+      gameState.player1.directionX = 'right';
     }
+    else if (gameState.player1.directionX == 'left'){
+      gameState.player1.anims.play('standLeft', true);
+    }
+    else {
+      gameState.player1.anims.play('standRight', true);
+    }
+
 
     if (gameState.keysPlayer1.up.isDown)
     {
