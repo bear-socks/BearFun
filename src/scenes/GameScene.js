@@ -1,5 +1,8 @@
 import 'phaser';
 
+//importing player class
+//import Player from "./Player.js"
+
 //i've seen better ways to do this but can't figure it out
 import cardinalRImg from './assets/cardinalRight.png';
 //import blueRImg from './assets/blueJayRight.png';
@@ -18,6 +21,8 @@ import blueBase from './assets/blueGate.png'
 var gameState = {};
 gameState.width = 1200;
 gameState.height = 800;
+//the speed of each player
+gameState.speed = 200;
 // var keysPlayer1;
 //var keysPlayer2;
 // var player1;
@@ -25,6 +30,10 @@ gameState.height = 800;
 
 
 //var player;
+
+function cool2(){
+  console.log('yeah2');
+}
 
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
@@ -52,6 +61,8 @@ export default class GameScene extends Phaser.Scene {
 
 
   create(){
+    cool();
+
     gameState.keysText = this.add.text(300, 100, '');
 
     //keyboard stuff
@@ -190,13 +201,13 @@ export default class GameScene extends Phaser.Scene {
     gameState.player1 = this.physics.add.sprite(gameState.width * .75, gameState.height * .5, 'blueJay');
     this.anims.create({
       key: 'movementLeft',
-      frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 1 }),
+      frames: [ { key: 'blueJay', frame: 1 }, { key: 'blueJay', frame: 0 } ],
       frameRate: 10,
       repeat: -1
     });
     this.anims.create({
       key: 'movementRight',
-      frames: this.anims.generateFrameNumbers('blueJay', { start: 2, end: 3 }),
+      frames: [ { key: 'blueJay', frame: 3 }, { key: 'blueJay', frame: 2 } ],
       frameRate: 10,
       repeat: -1
     });
@@ -212,7 +223,7 @@ export default class GameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
-    gameState.player1.setScale(1.5);
+    gameState.player1.setScale(1);
     gameState.player1.setBounce(.2);
     gameState.player1.setCollideWorldBounds(true);
     gameState.player1.isDashing = false;
@@ -229,7 +240,7 @@ export default class GameScene extends Phaser.Scene {
   createPlayer2(){
     gameState.player2 = this.physics.add.sprite(gameState.width * .25, gameState.height * .5, 'cardinalR');
     gameState.player2.setCollideWorldBounds(true);
-    gameState.player2.setScale(1.5);
+    gameState.player2.setScale(1);
     gameState.player2.setBounce(.2);
     gameState.player2.isDashing = false;
     gameState.player2.coolDown = 0;
@@ -392,8 +403,8 @@ export default class GameScene extends Phaser.Scene {
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
     //if reset is -1, player is alive
-    console.log(gameState.resetPlayer1);
-    console.log(gameState.resetPlayer2);
+    // console.log(gameState.resetPlayer1);
+    // console.log(gameState.resetPlayer2);
     if (gameState.resetPlayer1 == -1){
 
       gameState.player1.setVelocity(0);
@@ -440,14 +451,14 @@ export default class GameScene extends Phaser.Scene {
 
     if (gameState.keysPlayer1.up.isDown)
     {
-      gameState.player1.setVelocityY(-300);
+      gameState.player1.setVelocityY(-gameState.speed);
       gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
       gameState.player1.movingY = true;
 
     }
     else if (gameState.keysPlayer1.down.isDown)
     {
-      gameState.player1.setVelocityY(300);
+      gameState.player1.setVelocityY(gameState.speed);
       gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
       gameState.player1.movingY = true;
     }
@@ -455,13 +466,13 @@ export default class GameScene extends Phaser.Scene {
     if (gameState.keysPlayer1.left.isDown)
     {
       gameState.player1.anims.play('movementLeft', true);
-      gameState.player1.setVelocityX(-300);
+      gameState.player1.setVelocityX(-gameState.speed);
       gameState.player1.directionX = 'Left';
     }
     else if (gameState.keysPlayer1.right.isDown)
     {
       gameState.player1.anims.play('movementRight', true);
-      gameState.player1.setVelocityX(300);
+      gameState.player1.setVelocityX(gameState.speed);
       gameState.player1.directionX = 'Right';
     }
     else if (!gameState.player1.movingY && gameState.player1.directionX == 'Left'){
@@ -481,20 +492,20 @@ export default class GameScene extends Phaser.Scene {
 
     if (gameState.keysPlayer2.A.isDown)
     {
-      gameState.player2.setVelocityX(-300);
+      gameState.player2.setVelocityX(-gameState.speed);
     }
     else if (gameState.keysPlayer2.D.isDown)
     {
-      gameState.player2.setVelocityX(300);
+      gameState.player2.setVelocityX(gameState.speed);
     }
 
     if (gameState.keysPlayer2.W.isDown)
     {
-      gameState.player2.setVelocityY(-300);
+      gameState.player2.setVelocityY(-gameState.speed);
     }
     else if (gameState.keysPlayer2.S.isDown)
     {
-      gameState.player2.setVelocityY(300);
+      gameState.player2.setVelocityY(gameState.speed);
     }
     this.specialMovement2();
   }
@@ -504,29 +515,29 @@ export default class GameScene extends Phaser.Scene {
     //key is a number instead of a pointer which is the problem
     //this.add.text(600, 600, key);
     if(key == gameState.player1.lastKeys.left){
-      gameState.player1.setVelocityX(-300 * multiplier);
+      gameState.player1.setVelocityX(-gameState.speed * multiplier);
     }
     if(key == gameState.player1.lastKeys.right){
-      gameState.player1.setVelocityX(300 * multiplier);
+      gameState.player1.setVelocityX(gameState.speed * multiplier);
     }
     if(key == gameState.player1.lastKeys.up){
-      gameState.player1.setVelocityY(-300 * multiplier);
+      gameState.player1.setVelocityY(-gameState.speed * multiplier);
     }
     if(key == gameState.player1.lastKeys.down){
-      gameState.player1.setVelocityY(300 * multiplier);
+      gameState.player1.setVelocityY(gameState.speed * multiplier);
     }
 
     if(key == gameState.player2.lastKeys.A){
-      gameState.player2.setVelocityX(-300 * multiplier);
+      gameState.player2.setVelocityX(-gameState.speed * multiplier);
     }
     if(key == gameState.player2.lastKeys.D){
-      gameState.player2.setVelocityX(300 * multiplier);
+      gameState.player2.setVelocityX(gameState.speed * multiplier);
     }
     if(key == gameState.player2.lastKeys.W){
-      gameState.player2.setVelocityY(-300 * multiplier);
+      gameState.player2.setVelocityY(-gameState.speed * multiplier);
     }
     if(key == gameState.player2.lastKeys.S){
-      gameState.player2.setVelocityY(300 * multiplier);
+      gameState.player2.setVelocityY(gameState.speed * multiplier);
     }
   }
 
