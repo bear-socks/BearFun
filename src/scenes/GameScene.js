@@ -8,14 +8,16 @@ import blueJay from './assets/blueJay.png'
 import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
-
+import redBase from './assets/redGate.png';
+import blueBase from './assets/blueGate.png'
 //loading sound is not working, not sure why
 //import skyMall from './assets/skyMall.mp3';
 
 //this is used to avoid having to making global variables for everything
 //that we need to pass between the preload create and update functions
 var gameState = {};
-
+gameState.width = 1200;
+gameState.height = 800;
 // var keysPlayer1;
 //var keysPlayer2;
 // var player1;
@@ -42,7 +44,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('crate', crateImg);
     this.load.image('tree', treeImg);
     this.load.image('bomb', bombImg);
-
+    this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
+    this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
     //this.load.audio('theme', skyMall);
 
   }
@@ -64,6 +67,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.createWorld();
     this.createPlayer();
+    this.createBases();
 
     //how to click on stuff
     // gameState.clickCrate = this.add.sprite(800, 100, 'crate');
@@ -183,7 +187,7 @@ export default class GameScene extends Phaser.Scene {
 
   createPlayer1(){
     //add players to one group?
-    gameState.player1 = this.physics.add.sprite(900, 300, 'blueJay');
+    gameState.player1 = this.physics.add.sprite(gameState.width * .75, gameState.height * .5, 'blueJay');
     this.anims.create({
       key: 'movementLeft',
       frames: this.anims.generateFrameNumbers('blueJay', { start: 0, end: 1 }),
@@ -223,7 +227,7 @@ export default class GameScene extends Phaser.Scene {
   //gameState.player1 = player1;
   //this.physics.add.collider(gameState.player1, gameState.crates);
   createPlayer2(){
-    gameState.player2 = this.physics.add.sprite(300, 300, 'cardinalR');
+    gameState.player2 = this.physics.add.sprite(gameState.width * .25, gameState.height * .5, 'cardinalR');
     gameState.player2.setCollideWorldBounds(true);
     gameState.player2.setScale(1.5);
     gameState.player2.setBounce(.2);
@@ -234,15 +238,67 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(gameState.player2, gameState.crates);
   }
 
+
+  //creates the bases for both teams. Open when a player dies.
+  createBases(){
+    gameState.redBase = this.physics.add.sprite(0, 0, 'redBase');
+    gameState.redBase.setPosition(gameState.redBase.width / 2, gameState.height / 2);
+    gameState.redBase.open = false;
+    gameState.redBase.setImmovable(true);
+    this.anims.create({
+      key: 'openR',
+      frames: this.anims.generateFrameNumbers('redBase', { start: 1, end: 1 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.anims.create({
+      key: 'closeR',
+      frames: this.anims.generateFrameNumbers('redBase', { start: 0, end: 0 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.physics.add.collider(gameState.player1, gameState.redBase, () => {
+      if (gameState.redBase.open){
+        this.addScore(gameState.player1, 3);
+        this.respawn(gameState.player1);
+      }
+    })
+
+    gameState.blueBase = this.physics.add.sprite(0, 0, 'blueBase');
+    gameState.blueBase.setPosition(gameState.width - gameState.blueBase.width / 2, gameState.height / 2);
+    gameState.blueBase.open = false;
+    gameState.blueBase.setImmovable(true);
+    this.anims.create({
+      key: 'openB',
+      frames: this.anims.generateFrameNumbers('blueBase', { start: 1, end: 1 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.anims.create({
+      key: 'closeB',
+      frames: this.anims.generateFrameNumbers('blueBase', { start: 0, end: 0 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.physics.add.collider(gameState.player2, gameState.blueBase, () => {
+      if (gameState.blueBase.open){
+        this.addScore(gameState.player2, 3);
+        this.respawn(gameState.player2);
+      }
+    })
+  }
+
+
+
   createPlayerText(){
     gameState.player1.score = 0;
-    gameState.player1.scoreText = this.add.text(1050, 100, '0', { fontSize: '45px',
+    gameState.player1.scoreText = this.add.text(1050, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
     //score goes in front of players
     gameState.player1.scoreText.setDepth(1);
 
     gameState.player2.score = 0;
-    gameState.player2.scoreText = this.add.text(100, 100, '0', { fontSize: '45px',
+    gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
     //score goes in front of players
     gameState.player2.scoreText.setDepth(1);
@@ -255,10 +311,18 @@ export default class GameScene extends Phaser.Scene {
     player.lastKeys = {};
     player.setCollideWorldBounds(true);
     if(player == gameState.player1){
-      player.setPosition(1050, 300);
+      player.setPosition(gameState.width * .75, gameState.height * .5);
+
+      //closes blue base
+      gameState.blueBase.anims.play('closeB', true);
+      gameState.blueBase.open = false;
     }
     else if(player == gameState.player2){
-      player.setPosition(150, 300);
+      player.setPosition(gameState.width * .25, gameState.height * .5);
+
+      //closes red base
+      gameState.redBase.anims.play('closeR', true);
+      gameState.redBase.open = false;
     }
 
     //player.disableInteractive();
@@ -282,6 +346,10 @@ export default class GameScene extends Phaser.Scene {
       gameState.player2.disableInteractive();
       gameState.resetPlayer2 = 100;
 
+      //opens red base
+      gameState.redBase.anims.play('openR', true);
+      gameState.redBase.open = true;
+
       gameState.player2.setCollideWorldBounds(false);
       gameState.player2.setPosition(-1000, 0);
     }
@@ -291,6 +359,10 @@ export default class GameScene extends Phaser.Scene {
       this.addScore(gameState.player2, 1);
       gameState.player1.disableInteractive();
       gameState.resetPlayer1 = 100;
+
+      //opens blue base
+      gameState.blueBase.anims.play('openB', true);
+      gameState.blueBase.open = true;
 
       //just move them off the map
       gameState.player1.setCollideWorldBounds(false);

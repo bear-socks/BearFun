@@ -1,0 +1,62 @@
+{
+	"textures": [
+		{
+			"image": "blueGate.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 202,
+				"h": 1004
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "closed.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 500
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 200,
+						"h": 500
+					}
+				},
+				{
+					"filename": "open.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 500
+					},
+					"frame": {
+						"x": 1,
+						"y": 503,
+						"w": 200,
+						"h": 500
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:a4a1a0698b49941db325f3b17fb6618f:b26a33772c3b20a4821d5e627fe8f431:a1b07c623e9e6d3cafbaea623cc28d62$"
+	}
+}
