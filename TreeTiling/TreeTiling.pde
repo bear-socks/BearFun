@@ -7,9 +7,9 @@ void setup() {
   size(640, 640);
   tiles = new ArrayList<Tile>();
   genTiles();
-  
-  int[] yeah = {0,0,0,0,1,1,1,1};
-  int[] yeah2 = {1,1,1,0,0,0,0,1};
+
+  int[] yeah = {0, 0, 0, 0, 1, 1, 1, 1};
+  int[] yeah2 = {1, 1, 1, 0, 0, 0, 0, 1};
   tiles.add(new Tile(50, 50, yeah));
   tiles.add(new Tile(50 + SIZE, 50, yeah2));
 }
@@ -32,20 +32,20 @@ void genTiles() {
   genLastFill();
 }
 
-void genTile(float x, float y) {
+void genTile(int x, int y) {
   //int[] sides = new int[8];
   float r = random(8);
   genTile(x, y, r, r);
 }
 
-Tile genTile(float x, float y, float rMin, float rMax) {
+Tile genTile(int x, int y, float rMin, float rMax) {
   //int[] sides = new int[8];
   float r = random(rMin, rMax);
-  Tile t = genTile(x,y, r);
+  Tile t = genTile(x, y, r);
   return t;
 }
 
-Tile genTile(float x, float y, float r) {
+Tile genTile(int x, int y, float r) {
   //int[] sides = new int[8];
   Tile t = new Tile(x, y, r);
   Tile[] tileArr = getAdjTiles(t);
@@ -55,8 +55,8 @@ Tile genTile(float x, float y, float r) {
 
 void genSquares() {
   //0 = a full square
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 5; j += 3) {
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 5; j += 4) {
       tiles.add(new Tile(320 + i * 32, 320 + 32 * j, SQU));
     }
   }
@@ -69,14 +69,14 @@ void genFill() {
     if (t.isSquare()) {
       int num = 1;
       for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
-        float newX = t.x + x;
+        int newX = t.x + x;
         if (!containsSquare(newX, t.y)) {
           tiles.add(genTile(newX, t.y, num));
         }
         num++;
       }
       for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
-        float newY = t.y + y;
+        int newY = t.y + y;
         if (!containsSquare(t.x, newY)) {
           tiles.add(genTile(t.x, newY, num));
         }
@@ -87,14 +87,50 @@ void genFill() {
 }
 
 void genLastFill() {
+  //find diaganols and fill in
+
+  for (int m = tiles.size() - 1; m >= 0; m--) {
+    Tile t = tiles.get(m);
+    for (int n = tiles.size() - 1; n >= 0; n--) {
+      Tile t2 = tiles.get(n);
+      if (t2 != t) {
+        int x = (t.x - t2.x);
+        int y = (t.y - t2.y);
+        if (abs(x) == abs(y) && abs(y) == SIZE) {
+          //the tiles are diagonal from eachother
+          int i = 0;
+          int j = 0;
+          if (!contains(t.x, t2.y)) {
+            i = t.x;
+            j = t2.y;
+          } else if (!contains(t2.x, t.y)) {
+            i = t2.x;
+            j = t.y;
+          }
+          if (i != 0 && j != 0) {
+            tiles.add(genTile(i, j, -1));
+          }
+        }
+      }
+    }
+  }
 }
 
-boolean containsSquare(float x, float y) {
+boolean containsSquare(int x, int y) {
   for (Tile t : tiles) {
     if (t.isSquare()) {
       if (t.x == x && t.y == y) {
         return true;
       }
+    }
+  }
+  return false;
+}
+
+boolean contains(int x, int y) {
+  for (Tile t : tiles) {
+    if (t.x == x && t.y == y) {
+      return true;
     }
   }
   return false;

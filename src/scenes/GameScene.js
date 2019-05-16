@@ -234,8 +234,8 @@ export default class GameScene extends Phaser.Scene {
     gameState.player2.isDashing = false;
     gameState.player2.coolDown = 0;
     gameState.player2.lastKeys = {};
-    this.physics.add.collider(gameState.player2, gameState.bombs);
-    this.physics.add.collider(gameState.player2, gameState.crates);
+    // this.physics.add.collider(gameState.player2, gameState.bombs);
+    // this.physics.add.collider(gameState.player2, gameState.crates);
   }
 
 
