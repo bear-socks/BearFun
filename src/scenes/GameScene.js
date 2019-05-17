@@ -1,7 +1,7 @@
 import 'phaser';
 
 //importing player class
-//import Player from "./Player.js"
+import Player from "./Player.js"
 
 //i've seen better ways to do this but can't figure it out
 import cardinalRImg from './assets/cardinalRight.png';
@@ -31,14 +31,12 @@ gameState.speed = 200;
 
 //var player;
 
-function cool2(){
-  console.log('yeah2');
-}
+
 
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
   constructor(){
-    super('Game')
+    super('Game');
   }
 
   preload(){
@@ -61,18 +59,8 @@ export default class GameScene extends Phaser.Scene {
 
 
   create(){
-    cool();
 
     gameState.keysText = this.add.text(300, 100, '');
-
-    //keyboard stuff
-    //combine these into one or no?, might mess things up if I do
-    //player 1 keys
-    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
-    //used in special movement (for dash attacking)
-
-    //player 2 keys
-    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,A,S,D');
 
     //this.add.text(50, 50, 'will like poop');
 
@@ -117,56 +105,57 @@ export default class GameScene extends Phaser.Scene {
 
   }
 
-  genCrates(){
-    // gameState.crates = this.physics.add.staticGroup();
-    // gameState.crates.create(400, 568, 'crate').refreshBody();
-    function genCrate(){
-      //how to reference height and with in config.js?
-      const x = Math.random() * 1200;
-      const y = Math.random() * 800;
-      gameState.crates.create(x, y, 'crate').setCollideWorldBounds(true);
-    }
+  // genCrates(){
+  //   // gameState.crates = this.physics.add.staticGroup();
+  //   // gameState.crates.create(400, 568, 'crate').refreshBody();
+  //   function genCrate(){
+  //     //how to reference height and with in config.js?
+  //     const x = Math.random() * 1200;
+  //     const y = Math.random() * 800;
+  //     gameState.crates.create(x, y, 'crate').setCollideWorldBounds(true);
+  //   }
+  //
+  //   gameState.crates = this.physics.add.group();
+  //   gameState.crates.create(400, 568, 'crate').setCollideWorldBounds(true);
+  //
+  //   genCrate();
+  //
+  //   //not sure if this causes problems or not
+  //   this.physics.add.collider(gameState.crates, gameState.crates);
+  // }
 
-    gameState.crates = this.physics.add.group();
-    gameState.crates.create(400, 568, 'crate').setCollideWorldBounds(true);
-
-    genCrate();
-
-    //not sure if this causes problems or not
-    this.physics.add.collider(gameState.crates, gameState.crates);
-  }
-
-  genBombs(){
-
-    //creating bombs
-    function genBomb(){
-      const x = Math.random() * 1200;
-      const y = Math.random() * 800;
-      gameState.bombs.create(x, y, 'bomb').setScale(.2).setCollideWorldBounds(true);
-    }
-
-    gameState.bombs = this.physics.add.group();
-
-    gameState.bombGenLoop = this.time.addEvent({
-      delay: 5000,
-      callback: genBomb,
-      callbackScope: this,
-      loop: true
-    });
-
-    //text for numBombs
-    gameState.scoreText = this.add.text(250, 50,'BombsBlown: 0', { fontSize: '15px',
-    fill: '#FFFFFF'})
-    //bombs blow up on crates
-    gameState.bombsBlown = 0;
-    this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
-      bomb.destroy();
-      gameState.bombsBlown += 1;
-      //gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
-    });
-
-    this.physics.add.collider(gameState.bombs, gameState.bombs);
-  }
+  // genBombs(){
+  //
+  //   //creating bombs
+  //   function genBomb(){
+  //     const x = Math.random() * 1200;
+  //     const y = Math.random() * 800;
+  //     gameState.bombs.create(x, y, 'bomb').setScale(.2).setCollideWorldBounds(true);
+  //   }
+  //
+  //   gameState.bombs = this.physics.add.group();
+  //
+        //HOW TO DO SOMETHING PERIODICALLY
+  //   gameState.bombGenLoop = this.time.addEvent({
+  //     delay: 5000,
+  //     callback: genBomb,
+  //     callbackScope: this,
+  //     loop: true
+  //   });
+  //
+  //   //text for numBombs
+  //   gameState.scoreText = this.add.text(250, 50,'BombsBlown: 0', { fontSize: '15px',
+  //   fill: '#FFFFFF'})
+  //   //bombs blow up on crates
+  //   gameState.bombsBlown = 0;
+  //   this.physics.add.collider(gameState.bombs, gameState.crates, function(bomb){
+  //     bomb.destroy();
+  //     gameState.bombsBlown += 1;
+  //     //gameState.scoreText.setText(`BombsBlown: ${gameState.bombsBlown}`);
+  //   });
+  //
+  //   this.physics.add.collider(gameState.bombs, gameState.bombs);
+  // }
 
   //called once
   createPlayer(p1 = true, p2 = true){
@@ -174,11 +163,11 @@ export default class GameScene extends Phaser.Scene {
     //calls player create functions
     if (p1){
       this.createPlayer1()
-      gameState.resetPlayer1 = -1;
+      gameState.player1.respawnCounter = -1;
     }
     if (p2){
       this.createPlayer2()
-      gameState.resetPlayer2 = -1;
+      gameState.player2.respawnCounter = -1;
     }
 
     //gameState.players = this.physics.add.group();
@@ -197,8 +186,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayer1(){
+    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+
     //add players to one group?
     gameState.player1 = this.physics.add.sprite(gameState.width * .75, gameState.height * .5, 'blueJay');
+    gameState.player1 = new Player(gameState.player1, gameState.keysPlayer1);
+    gameState.player1.functions.poop();
+    //gameState.player1.functions.poop();
     this.anims.create({
       key: 'movementLeft',
       frames: [ { key: 'blueJay', frame: 1 }, { key: 'blueJay', frame: 0 } ],
@@ -223,30 +217,15 @@ export default class GameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
-    gameState.player1.setScale(1);
-    gameState.player1.setBounce(.2);
-    gameState.player1.setCollideWorldBounds(true);
-    gameState.player1.isDashing = false;
-    gameState.player1.coolDown = 0;
-    gameState.player1.lastKeys = {};
-    gameState.player1.directionX = 'Left';
-    this.physics.add.collider(gameState.player1, gameState.bombs);
-    this.physics.add.collider(gameState.player1, gameState.crates);
-
   }
 
   //gameState.player1 = player1;
   //this.physics.add.collider(gameState.player1, gameState.crates);
   createPlayer2(){
+    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,S,A,D');
     gameState.player2 = this.physics.add.sprite(gameState.width * .25, gameState.height * .5, 'cardinalR');
-    gameState.player2.setCollideWorldBounds(true);
-    gameState.player2.setScale(1);
-    gameState.player2.setBounce(.2);
-    gameState.player2.isDashing = false;
-    gameState.player2.coolDown = 0;
-    gameState.player2.lastKeys = {};
-    // this.physics.add.collider(gameState.player2, gameState.bombs);
-    // this.physics.add.collider(gameState.player2, gameState.crates);
+    gameState.player2 = new Player(gameState.player2, gameState.keysPlayer2);
+    gameState.player2.functions.poop();
   }
 
 
@@ -302,41 +281,31 @@ export default class GameScene extends Phaser.Scene {
 
 
   createPlayerText(){
-    gameState.player1.score = 0;
     gameState.player1.scoreText = this.add.text(1050, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
     //score goes in front of players
     gameState.player1.scoreText.setDepth(1);
 
-    gameState.player2.score = 0;
     gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
-    //score goes in front of players
     gameState.player2.scoreText.setDepth(1);
   }
 
   respawn(player){
-    // for(var key in gameState.player1.lastKeys){
-    //   key = 0;
-    // }
-    player.lastKeys = {};
-    player.setCollideWorldBounds(true);
-    if(player == gameState.player1){
-      player.setPosition(gameState.width * .75, gameState.height * .5);
+    player.functions.respawn();
 
+    //should have bases as a key in the player class
+    //and have bases as an object
+    if(player == gameState.player1){
       //closes blue base
-      gameState.blueBase.anims.play('closeB', true);
-      gameState.blueBase.open = false;
+      //gameState.blueBase.anims.play('closeB', true);
+      //gameState.blueBase.open = false;
     }
     else if(player == gameState.player2){
-      player.setPosition(gameState.width * .25, gameState.height * .5);
-
       //closes red base
-      gameState.redBase.anims.play('closeR', true);
-      gameState.redBase.open = false;
+      //gameState.redBase.anims.play('closeR', true);
+      //gameState.redBase.open = false;
     }
-
-    //player.disableInteractive();
   }
 
   getOtherPlayer(player){
@@ -350,34 +319,24 @@ export default class GameScene extends Phaser.Scene {
 
   gotBeaked(){
     if (gameState.player1.isDashing){
-      //stops the dash
-      gameState.player1.lastKeys = {};
-      gameState.player2.setVelocity(0);
-      this.addScore(gameState.player1, 1);
-      gameState.player2.disableInteractive();
-      gameState.resetPlayer2 = 100;
-
+      gameState.player1.functions.kill(gameState.player2);
+      gameState.player2.respawnCounter = 100;
       //opens red base
       gameState.redBase.anims.play('openR', true);
       gameState.redBase.open = true;
-
-      gameState.player2.setCollideWorldBounds(false);
-      gameState.player2.setPosition(-1000, 0);
+      gameState.blueBase.open = false;
+      gameState.blueBase.anims.play('closeB', true);
     }
     if (gameState.player2.isDashing){
-      gameState.player2.lastKeys = {};
-      gameState.player1.setVelocity(0);
-      this.addScore(gameState.player2, 1);
-      gameState.player1.disableInteractive();
-      gameState.resetPlayer1 = 100;
+
+      gameState.player2.functions.kill(gameState.player1);
+      gameState.player1.respawnCounter = 100;
 
       //opens blue base
       gameState.blueBase.anims.play('openB', true);
       gameState.blueBase.open = true;
-
-      //just move them off the map
-      gameState.player1.setCollideWorldBounds(false);
-      gameState.player1.setPosition(-1200, 0);
+      gameState.redBase.open = false;
+      gameState.redBase.anims.play('closeR', true);
     }
   }
 
@@ -399,13 +358,13 @@ export default class GameScene extends Phaser.Scene {
     this.scene.restart();
   }
 
-  update (){
+  update(){
     //these two methods could easily be consolidated into a single and separate function
     //player1 movement
     //if reset is -1, player is alive
-    // console.log(gameState.resetPlayer1);
-    // console.log(gameState.resetPlayer2);
-    if (gameState.resetPlayer1 == -1){
+    // console.log(gameState.player1.respawnCounter);
+    // console.log(gameState.player2.respawnCounter);
+    if (gameState.player1.respawnCounter == -1){
 
       gameState.player1.setVelocity(0);
       if(gameState.player1.coolDown == 0){
@@ -415,16 +374,16 @@ export default class GameScene extends Phaser.Scene {
         gameState.player1.coolDown -= 1;
       }
     }
-    else if (gameState.resetPlayer1 == 0){
-      gameState.resetPlayer1 = -1;
+    else if (gameState.player1.respawnCounter == 0){
+      gameState.player1.respawnCounter = -1;
       this.respawn(gameState.player1);
     }
     else{
-      gameState.resetPlayer1 -= 1;
+      gameState.player1.respawnCounter -= 1;
     }
 
     //player2 movement
-    if (gameState.resetPlayer2 == -1){
+    if (gameState.player2.respawnCounter == -1){
       //this line should only happen when the player2 object comes back but is happening before it does
       //when both the birds kill each other at the same time
       //console.log("hi2");
@@ -436,12 +395,12 @@ export default class GameScene extends Phaser.Scene {
         gameState.player2.coolDown -= 1;
       }
     }
-    else if (gameState.resetPlayer2 == 0){
-      gameState.resetPlayer2 = -1;
+    else if (gameState.player2.respawnCounter == 0){
+      gameState.player2.respawnCounter = -1;
       this.respawn(gameState.player2);
     }
     else{
-      gameState.resetPlayer2 -= 1;
+      gameState.player2.respawnCounter -= 1;
 
     }
   }
@@ -510,37 +469,6 @@ export default class GameScene extends Phaser.Scene {
     this.specialMovement2();
   }
 
-  //I think this is where the dashing problem is
-  move(key, multiplier){
-    //key is a number instead of a pointer which is the problem
-    //this.add.text(600, 600, key);
-    if(key == gameState.player1.lastKeys.left){
-      gameState.player1.setVelocityX(-gameState.speed * multiplier);
-    }
-    if(key == gameState.player1.lastKeys.right){
-      gameState.player1.setVelocityX(gameState.speed * multiplier);
-    }
-    if(key == gameState.player1.lastKeys.up){
-      gameState.player1.setVelocityY(-gameState.speed * multiplier);
-    }
-    if(key == gameState.player1.lastKeys.down){
-      gameState.player1.setVelocityY(gameState.speed * multiplier);
-    }
-
-    if(key == gameState.player2.lastKeys.A){
-      gameState.player2.setVelocityX(-gameState.speed * multiplier);
-    }
-    if(key == gameState.player2.lastKeys.D){
-      gameState.player2.setVelocityX(gameState.speed * multiplier);
-    }
-    if(key == gameState.player2.lastKeys.W){
-      gameState.player2.setVelocityY(-gameState.speed * multiplier);
-    }
-    if(key == gameState.player2.lastKeys.S){
-      gameState.player2.setVelocityY(gameState.speed * multiplier);
-    }
-  }
-
   specialMovement1(){
     this.specialMovement(gameState.player1.lastKeys, gameState.player1);
 
@@ -588,11 +516,12 @@ export default class GameScene extends Phaser.Scene {
       }
       //dashing
       else if(lKeys[key] <= -1){
-        this.move(lKeys[key], 3);
+        console.log(key);
+        player.functions.move(key, 3);
         gameState.dashingVar = true;
         if(lKeys[key] == -1){
           gameState.dashingVar = false;
-          this.setCoolDown(lKeys[key]);
+          player.functions.setCoolDown();
         }
         lKeys[key] += 1;
       }
@@ -605,31 +534,13 @@ export default class GameScene extends Phaser.Scene {
 
   }
 
-  //remember this is only comparing values not pointers but should still work
-  //coolDown of 30 frames currently
-  setCoolDown(key){
-    if(gameState.player1.lastKeys.left == key ||
-      gameState.player1.lastKeys.right == key ||
-      gameState.player1.lastKeys.up == key ||
-      gameState.player1.lastKeys.down == key){
-        gameState.player1.coolDown = 30;
-      }
-      else if(gameState.player2.lastKeys.A == key ||
-        gameState.player2.lastKeys.D == key ||
-        gameState.player2.lastKeys.W == key ||
-        gameState.player2.lastKeys.S == key){
-          gameState.player2.coolDown = 30;
-        }
-      }
-
-      specialMovementKeyVal(key){
-        if(key > 0){
-          //gameState.player1.setVelocityX(-2400);
-          return -15;
-        }
-        else{
-          return 12;
-        }
-      }
-
+  specialMovementKeyVal(key){
+    if(key > 0){
+      //gameState.player1.setVelocityX(-2400);
+      return -15;
     }
+    else{
+      return 12;
+    }
+  }
+}
