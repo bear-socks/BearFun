@@ -249,8 +249,8 @@ export default class GameScene extends Phaser.Scene {
     });
     this.physics.add.collider(gameState.player1, gameState.redBase, () => {
       if (gameState.redBase.open){
-        this.addScore(gameState.player1, 3);
-        this.respawn(gameState.player1);
+        gameState.player1.functions.addScore(3);
+        gameState.player1.functions.respawn();
       }
     })
 
@@ -272,8 +272,8 @@ export default class GameScene extends Phaser.Scene {
     });
     this.physics.add.collider(gameState.player2, gameState.blueBase, () => {
       if (gameState.blueBase.open){
-        this.addScore(gameState.player2, 3);
-        this.respawn(gameState.player2);
+        gameState.player2.functions.addScore(3);
+        gameState.player2.functions.respawn();
       }
     })
   }
@@ -289,23 +289,6 @@ export default class GameScene extends Phaser.Scene {
     gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
     gameState.player2.scoreText.setDepth(1);
-  }
-
-  respawn(player){
-    player.functions.respawn();
-
-    //should have bases as a key in the player class
-    //and have bases as an object
-    if(player == gameState.player1){
-      //closes blue base
-      //gameState.blueBase.anims.play('closeB', true);
-      //gameState.blueBase.open = false;
-    }
-    else if(player == gameState.player2){
-      //closes red base
-      //gameState.redBase.anims.play('closeR', true);
-      //gameState.redBase.open = false;
-    }
   }
 
   getOtherPlayer(player){
@@ -340,19 +323,6 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  addScore(player, num){
-    player.score += num;
-    player.scoreText.setText(`${player.score}`);
-  }
-
-  //do everything necessary to pause the game
-  stopGame(){
-    //stop generating bombs
-    gameState.bombGenLoop.destroy();
-    //stop physics
-    this.physics.pause();
-  }
-
   //do everything necessary to restart the game
   restartGame(){
     this.scene.restart();
@@ -376,7 +346,7 @@ export default class GameScene extends Phaser.Scene {
     }
     else if (gameState.player1.respawnCounter == 0){
       gameState.player1.respawnCounter = -1;
-      this.respawn(gameState.player1);
+      gameState.player1.functions.respawn();
     }
     else{
       gameState.player1.respawnCounter -= 1;
@@ -397,27 +367,26 @@ export default class GameScene extends Phaser.Scene {
     }
     else if (gameState.player2.respawnCounter == 0){
       gameState.player2.respawnCounter = -1;
-      this.respawn(gameState.player2);
+      gameState.player2.functions.respawn();
     }
     else{
       gameState.player2.respawnCounter -= 1;
 
     }
   }
-  player1Movement(){
 
+  //need to consolidate animations into the player class
+  player1Movement(){
     gameState.player1.movingY = false;
 
     if (gameState.keysPlayer1.up.isDown)
     {
-      gameState.player1.setVelocityY(-gameState.speed);
       gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
       gameState.player1.movingY = true;
 
     }
     else if (gameState.keysPlayer1.down.isDown)
     {
-      gameState.player1.setVelocityY(gameState.speed);
       gameState.player1.anims.play(`movement${gameState.player1.directionX}`, true);
       gameState.player1.movingY = true;
     }
@@ -425,13 +394,11 @@ export default class GameScene extends Phaser.Scene {
     if (gameState.keysPlayer1.left.isDown)
     {
       gameState.player1.anims.play('movementLeft', true);
-      gameState.player1.setVelocityX(-gameState.speed);
       gameState.player1.directionX = 'Left';
     }
     else if (gameState.keysPlayer1.right.isDown)
     {
       gameState.player1.anims.play('movementRight', true);
-      gameState.player1.setVelocityX(gameState.speed);
       gameState.player1.directionX = 'Right';
     }
     else if (!gameState.player1.movingY && gameState.player1.directionX == 'Left'){
@@ -441,92 +408,42 @@ export default class GameScene extends Phaser.Scene {
       gameState.player1.anims.play('standRight', true);
     }
 
-
-
-    this.specialMovement1();
+    gameState.player1.functions.movement();
+    this.specialMovement(gameState.player1);
   }
 
   player2Movement(){
     //player2 movement
-
-    if (gameState.keysPlayer2.A.isDown)
-    {
-      gameState.player2.setVelocityX(-gameState.speed);
-    }
-    else if (gameState.keysPlayer2.D.isDown)
-    {
-      gameState.player2.setVelocityX(gameState.speed);
-    }
-
-    if (gameState.keysPlayer2.W.isDown)
-    {
-      gameState.player2.setVelocityY(-gameState.speed);
-    }
-    else if (gameState.keysPlayer2.S.isDown)
-    {
-      gameState.player2.setVelocityY(gameState.speed);
-    }
-    this.specialMovement2();
-  }
-
-  specialMovement1(){
-    this.specialMovement(gameState.player1.lastKeys, gameState.player1);
-
-    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.left)){
-      //could I send this in as a pointer instead of an int value?
-      gameState.player1.lastKeys.left = this.specialMovementKeyVal(gameState.player1.lastKeys.left);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.right)){
-      gameState.player1.lastKeys.right = this.specialMovementKeyVal(gameState.player1.lastKeys.right);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.up)){
-      gameState.player1.lastKeys.up = this.specialMovementKeyVal(gameState.player1.lastKeys.up);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer1.down)){
-      gameState.player1.lastKeys.down = this.specialMovementKeyVal(gameState.player1.lastKeys.down);
-    }
-  }
-
-  specialMovement2(){
-    this.specialMovement(gameState.player2.lastKeys, gameState.player2);
-    //player 2
-    if(Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.A)){
-      //could I send this in as a pointer instead of an int value?
-      gameState.player2.lastKeys.A = this.specialMovementKeyVal(gameState.player2.lastKeys.A);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
-      gameState.player2.lastKeys.D = this.specialMovementKeyVal(gameState.player2.lastKeys.D);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
-      gameState.player2.lastKeys.W = this.specialMovementKeyVal(gameState.player2.lastKeys.W);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
-      gameState.player2.lastKeys.S = this.specialMovementKeyVal(gameState.player2.lastKeys.S);
-    }
+    gameState.player2.functions.movement()
+    this.specialMovement(gameState.player2);
   }
 
   //lKeys is a lastKeys object
-  specialMovement(lKeys, player){
+  specialMovement(player){
+    //console.log(gameState.player2.directKeys[1]);
+    player.functions.specialMovementCheck();
     let str = '';
     gameState.dashingVar = false;
-    for (var key in lKeys) {
+    for (var i = 0; i <= 3; i++){
       //not dashing
-      if (lKeys[key] >= 1) {
-        lKeys[key] -= 1;
+      if (player.lastKeys[i] >= 1) {
+        player.lastKeys[i] -= 1;
       }
       //dashing
-      else if(lKeys[key] <= -1){
-        console.log(key);
-        player.functions.move(key, 3);
+      else if(player.lastKeys[i] <= -1){
+        //console.log(key);
+        player.functions.move(i, 3);
         gameState.dashingVar = true;
-        if(lKeys[key] == -1){
+        if(player.lastKeys[i] == -1){
           gameState.dashingVar = false;
           player.functions.setCoolDown();
         }
-        lKeys[key] += 1;
+        player.lastKeys[i] += 1;
       }
-      str += key +': ' + lKeys[key] + ' ; ';
+
+      str += i +': ' + player.lastKeys[i] + ' ; ';
     }
+    //console.log(str);
     player.isDashing = gameState.dashingVar;
 
     //doesn't show up for player1, because player2 happens second in the same frame

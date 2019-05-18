@@ -1,3 +1,6 @@
+//further plans
+// implement bases into this class
+// and animations for both players and the bases
 
 //IMPORTANT
 // to call a function from this class, call the player
@@ -33,50 +36,52 @@ export default class Player{
 
     //stuff we need could implement but might be hard
     player.lastKeys = {};
+    //the names of the keys
     player.keys = Object.keys(keys);
+    //the actual values of the keys
+    player.directKeys = Object.values(keys);
     //keeps a pointer to this actual object
     player.functions = this;
 
     player.setCollideWorldBounds(true);
     player.setScale(player.scale);
     player.setBounce(player.bounce);
-    console.log('made a new player  / dashing :' + player.isDashing);
+    //console.log('made a new player  / dashing :' + player.isDashing);
 
     //but returns the original parameter
     return player;
   }
 
+  movement(){
+    for(var i = 0; i <= 3; i++){
+      if (this.player.directKeys[i].isDown) {
+        this.move(i, 1);
+      }
+    }
+  }
+
   //I think this is where the dashing problem is
   move(key, multiplier){
-    //key is a number instead of a pointer which is the problem
     //this.add.text(600, 600, key);
-    if(key == this.player.keys[2]){
+    if(key == 2){
       this.player.setVelocityX(-this.player.speed * multiplier);
     }
-    if(key == this.player.keys[3]){
+    if(key == 3){
       this.player.setVelocityX(this.player.speed * multiplier);
     }
-    if(key == this.player.keys[0]){
+    if(key == 0){
       this.player.setVelocityY(-this.player.speed * multiplier);
     }
-    if(key == this.player.keys[1]){
+    if(key == 1){
       this.player.setVelocityY(this.player.speed * multiplier);
     }
   }
 
   specialMovementCheck(){
-    if(Phaser.Input.Keyboard.JustDown(this.player.keys[0])){
-      //could I send this in as a pointer instead of an int value?
-      this.player.lastKeys[0] = specialMovementKeyVal(this.player.lastKeys[0]);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.D)){
-      gameState.player2.lastKeys.D = specialMovementKeyVal(gameState.player2.lastKeys.D);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.W)){
-      gameState.player2.lastKeys.W = specialMovementKeyVal(gameState.player2.lastKeys.W);
-    }
-    if (Phaser.Input.Keyboard.JustDown(gameState.keysPlayer2.S)){
-      gameState.player2.lastKeys.S = specialMovementKeyVal(gameState.player2.lastKeys.S);
+    for(var i = 0; i <= 3; i++){
+      if(Phaser.Input.Keyboard.JustDown(this.player.directKeys[i])){
+        this.player.lastKeys[i] = this.specialMovementKeyVal(this.player.lastKeys[i]);
+      }
     }
   }
 
@@ -108,8 +113,7 @@ export default class Player{
   kill(otherPlayer){
     //stops the dashing
     this.player.lastKeys = {};
-    this.player.score += 1;
-    this.player.scoreText.setText(`${this.player.score}`);
+    this.addScore(1);
 
     //something weird was going on with this line below
     otherPlayer.respawnCounter = 100;
@@ -119,6 +123,11 @@ export default class Player{
     //could cause a problem with both characters dying at the same time and going to the same position
     //so put in the random initX value
     otherPlayer.setPosition(-1000, this.initX);
+  }
+
+  addScore(num){
+    this.player.score += num;
+    this.player.scoreText.setText(`${this.player.score}`);
   }
 
   poop(){
