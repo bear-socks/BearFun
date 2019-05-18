@@ -420,6 +420,7 @@ export default class GameScene extends Phaser.Scene {
 
   //lKeys is a lastKeys object
   specialMovement(player){
+    //
     //console.log(gameState.player2.directKeys[1]);
     player.functions.specialMovementCheck();
     let str = '';
