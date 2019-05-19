@@ -3,22 +3,69 @@ int SIZE = 32;
 
 int SQU = 0;
 
+//can be a regular array
+HashMap<String, PImage> imgs = new HashMap<String, PImage>();
+
 void setup() {
   size(640, 640);
-  tiles = new ArrayList<Tile>();
-  genTiles();
 
-  int[] yeah = {0, 0, 0, 0, 1, 1, 1, 1};
-  int[] yeah2 = {1, 1, 1, 0, 0, 0, 0, 1};
-  tiles.add(new Tile(50, 50, yeah));
-  tiles.add(new Tile(50 + SIZE, 50, yeah2));
+  tiles = new ArrayList<Tile>();
+
+  loadImages();
+
+  //int[] yeah = {0, 0, 0, 0, 1, 1, 1, 1};
+  //int[] yeah2 = {1, 1, 1, 0, 0, 0, 0, 1};
+  ////tiles.add(new Tile(50, 50, yeah));
+  //tiles.add(new Tile(50 + SIZE, 50, yeah2));
+  //println(" " + new Tile(50 + SIZE, 50, yeah2).convertBinary());
+
+  genTiles();
+}
+
+void loadImages() {
+  //8
+  addImg("11111111");
+  //3's special case
+  addImg("00000111");
+  addImg("00011100");
+  addImg("01110000");
+  addImg("11000001");
+
+  //go through every position with four to 8 ones
+  for (int numOnes = 4; numOnes <= 7; numOnes++) {
+    String str = "";
+    for (int i = 0; i < numOnes; i++) {
+      str += "1";
+    }
+    for (int i = numOnes; i < 8; i++) {
+      str += "0";
+    }
+    //rotate through all possibilities
+    for (int i = 0; i < 8; i++) {
+      addImg(str);
+      str = rotateForward(str);
+    }
+  }
+}
+
+void addImg(String str) {
+  imgs.put(str, loadImage(str + ".png"));
 }
 
 void draw() {
+  //noLoop();
   background(255);
   for (Tile t : tiles) {
     t.display();
   }
+}
+
+String rotateForward(String str) {
+  String newStr = "";
+  for (int i = 1; i <= str.length(); i++) {
+    newStr += str.charAt(i % str.length());
+  }
+  return newStr;
 }
 
 void genTiles() {
@@ -30,6 +77,8 @@ void genTiles() {
   genSquares();
   genFill();
   genLastFill();
+  removeTiles();
+  squareEdgesFix();
 }
 
 void genTile(int x, int y) {
@@ -55,8 +104,8 @@ Tile genTile(int x, int y, float r) {
 
 void genSquares() {
   //0 = a full square
-  for (int i = 0; i < 8; i++) {
-    for (int j = 0; j < 5; j += 4) {
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 1; j += 1) {
       tiles.add(new Tile(320 + i * 32, 320 + 32 * j, SQU));
     }
   }
@@ -108,10 +157,72 @@ void genLastFill() {
             j = t.y;
           }
           if (i != 0 && j != 0) {
-            tiles.add(genTile(i, j, -1));
+            Tile t3 = genTile(i, j, -1);
+            if (!isValidTile(t3)) {
+              //fixAdjCorners(t, t2, i, j);
+            }
+            else{
+             tiles.add(t3); 
+            }
           }
         }
       }
+    }
+  }
+}
+
+//x and y are the position of the new Tile
+void fixAdjCorners(Tile t1, Tile t2, float x, float y){
+  if(x > t1.x){
+    if(t1.y < t2.y){
+      t1.eraseVerts(4, 5);
+      t2.eraseVerts(3, 4);
+    }
+    else{
+      t1.eraseVerts(5, 6);
+      t2.eraseVerts(6, 7);
+    }
+  }
+  else if(x < t1.x){
+    if(t1.y < t2.y){
+      t1.eraseVerts(1,2);
+      t2.eraseVerts(2,3);
+    }
+    else{
+      t1.eraseVerts(0, 1);
+      t2.eraseVerts(0, 7);
+    }
+  }
+  else if(x == t1.x){
+   //fixAdjCorners(t2, t1, x, y); 
+  }
+}
+
+boolean isValidTile(Tile t) {
+  try {
+    image(imgs.get(t.getCode()), -100, 0);
+  }
+  catch(Exception e) {
+    return false;
+  }
+  return true;
+}
+
+void removeTiles() {
+  //fixing the tiles up for binary conversion
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    Tile t = tiles.get(i);
+    //println(imgs.get(t.getCode()));
+    if(!isValidTile(t)){
+     tiles.remove(t); 
+    }
+  }
+}
+
+void squareEdgesFix() {
+  for (Tile t : tiles) {
+    if (t.isSquare()) {
+      t.fixSquare(getAdjTilesAll(t));
     }
   }
 }
@@ -136,7 +247,37 @@ boolean contains(int x, int y) {
   return false;
 }
 
+//returns adjacent tiles (square or non-square)
+//0 = left, 1 = right, 2 = top, 3 = bottom
+Tile[] getAdjTilesAll(Tile t) {
+  Tile[] adjTiles = new Tile[4];
+
+  for (Tile adjT : tiles) {
+    int num = 0;
+    //print("r");
+    for (float x = -SIZE + t.x; x <= SIZE + t.x; x += SIZE * 2) {
+      //print("l");
+      if (adjT.x == x && adjT.y == t.y) {
+        adjTiles[num] = adjT;
+        //print("yay1!");
+      }
+      num++;
+    }
+    for (float y = -SIZE + t.y; y <= SIZE + t.y; y += SIZE * 2) {
+      if (adjT.y == y && adjT.x == t.x) {
+        adjTiles[num] = adjT;
+        //print("yay2!");
+      }
+      num++;
+    }
+  }
+  return adjTiles;
+}
+
+
+
 //returns adjacent tiles (non-square)
+//0 = left, 1 = right, 2 = top, 3 = bottom
 Tile[] getAdjTiles(Tile t) {
   Tile[] adjTiles = new Tile[4];
 

@@ -16,21 +16,18 @@ class Tile {
   }
 
   void display() {
-    fill(0);
-    //if(isSquare()){
-    //  fill(0,0, 255);
+    fill(0, 100);
+    noFill();
+    noStroke();
+    //if (isSquare()) {
+    //  fill(0, 0, 255, 100);
     //}
     //stroke(255, 0, 0);
     pushMatrix();
     translate(x, y);
+    //println(getCode());
+    image(imgs.get(getCode()), 0, 0);
     beginShape();
-
-
-    //for(int i : verts){
-    // //print(i + ", "); 
-    //}
-    //println();
-
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
       if (verts[i] == 1) {
@@ -75,8 +72,8 @@ class Tile {
   int[] genVerts(float r) {
     int[] verts = new int[8];
 
-    
-    if(r == -1){
+
+    if (r == -1) {
       //corner piece
       verts = genVerts(0, -1);
     }
@@ -85,7 +82,7 @@ class Tile {
       verts = genVerts(0, 7);
     } else {
       int add = (int) random(1, 3);
-      int add2 = (int) random(2);
+      int add2 = (int) random(1, 2);
       if (add == add2) {
         //add += 1;
       }
@@ -159,28 +156,25 @@ class Tile {
       Tile adjT = tileArr[i];
       if (adjT != null) {
         //not sure about i == 0
-        if(i == 0){
+        if (i == 0) {
           //matching up this particular side
-          for(int n = 4; n <= 6; n++){
+          for (int n = 4; n <= 6; n++) {
             verts[6 - n % 8] = adjT.verts[n % 8];
           }
-        }
-        else if(i == 1){
-          for(int n = 4; n <= 6; n++){
+        } else if (i == 1) {
+          for (int n = 4; n <= 6; n++) {
             verts[n] = adjT.verts[6 - n % 8];
           }
           //for(int q = 0; q <= 2; q++){
           //  println(verts[q] == adjT.verts[6 - q]);
           //}
           //verts = genVerts(0, 8);
-        }
-        else if(i == 2){
-          for(int n = 6; n <= 8; n++){
+        } else if (i == 2) {
+          for (int n = 6; n <= 8; n++) {
             verts[n % 8] = adjT.verts[(10 - n) % 8];
           }
-        }
-        else if(i == 3){
-          for(int n = 6; n <= 8; n++){
+        } else if (i == 3) {
+          for (int n = 6; n <= 8; n++) {
             verts[(10 - n) % 8] = adjT.verts[n % 8];
           }
         }
@@ -189,4 +183,62 @@ class Tile {
       //println(tileArr[i]);
     }
   }
+
+  void fixSquare(Tile[] adjT) {
+    int index = -1;
+    for (int i = 0; i < adjT.length; i++) {
+      if (adjT[i] == null) {
+        if (index != -1) {
+          println("ERROR FIXSQUARE");
+        }
+        index = i;
+      }
+    }
+    //converting to the vertex coordinate 
+    if (index != -1) {
+       println(index);
+      if(index == 0){
+        index = 1;
+      }
+      else if(index == 1){
+        index = 5;
+      }
+      else if(index == 2){
+        index = 7;
+      }
+      //index = 3 both times
+      println(index);
+      println();
+      verts[index] = 0;
+    }
+    
+  }
+  
+  void eraseVerts(int one, int two){
+    verts[one] = -1;
+    verts[two] = -1;
+  }
+
+  String getCode() {
+    String str = "";
+    for (int i = 0; i < verts.length; i++) {
+      str += verts[i];
+    }
+    return str;
+  }
+
+  //int convertBinary(){
+  //  int sum = 0;
+  //  for(int i = 0; i < verts.length; i++){
+  //    if(i == 0){
+  //      //1 or 0
+  //      sum += verts[0];
+  //    }
+  //    else{
+  //      sum += pow(verts[i] * 2, i);
+  //    }
+  //    print(verts[i]);
+  //  }
+  //  return sum;
+  //}
 }

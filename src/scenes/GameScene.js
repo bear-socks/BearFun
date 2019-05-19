@@ -451,14 +451,14 @@ export default class GameScene extends Phaser.Scene {
     //gameState.keysText.setText(str);
 
   }
-
-  specialMovementKeyVal(key){
-    if(key > 0){
-      //gameState.player1.setVelocityX(-2400);
-      return -15;
-    }
-    else{
-      return 12;
-    }
-  }
+  //
+  // specialMovementKeyVal(key){
+  //   if(key > 0){
+  //     //gameState.player1.setVelocityX(-2400);
+  //     return -15;
+  //   }
+  //   else{
+  //     return 12;
+  //   }
+  // }
 }

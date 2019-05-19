@@ -87,6 +87,7 @@ export default class Player{
 
   specialMovementKeyVal(key){
     if(key > 0){
+      console.log('dash');
       //gameState.player1.setVelocityX(-2400);
       return -15;
     }
