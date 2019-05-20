@@ -10,7 +10,10 @@
 //   player1.functions.move();
 
 //ADD IN A PLAYERS BASE
-const speed = 200;
+var speed = 200;
+
+var LEFT = 0;
+var RIGHT = 1;
 
 //could maybe extend a Phaser.body object to be more simple
 export default class Player{
@@ -27,8 +30,11 @@ export default class Player{
     player.speed = speed;
     player.respawnCounter = 0;
     //not sure about these two
-    player.directionX = 'Left';
+    player.directionX = 0;
     player.movingY = false;
+
+    //the movementAnimations for a player
+    player.animArr = [];
 
     //must assign this though
     //player.body;
@@ -43,6 +49,7 @@ export default class Player{
     //keeps a pointer to this actual object
     player.functions = this;
 
+
     player.setCollideWorldBounds(true);
     player.setScale(player.scale);
     player.setBounce(player.bounce);
@@ -52,12 +59,36 @@ export default class Player{
     return player;
   }
 
+  updatePlayer(){
+    //if reset is -1, player is alive
+    // console.log(gameState.player1.respawnCounter);
+    // console.log(gameState.player2.respawnCounter);
+    if (this.player.respawnCounter == -1){
+       this.player.setVelocity(0);
+       if(this.player.coolDown == 0){
+         this.movement();
+       }
+       else{
+         this.player.coolDown -= 1;
+       }
+     }
+     else if (this.player.respawnCounter == 0){
+       this.player.respawnCounter = -1;
+       this.player.functions.respawn();
+     }
+     else{
+       this.player.respawnCounter -= 1;
+     }
+  }
+
   movement(){
     for(var i = 0; i <= 3; i++){
       if (this.player.directKeys[i].isDown) {
         this.move(i, 1);
       }
     }
+    this.specialMovement();
+    this.animatePlayer();
   }
 
   //I think this is where the dashing problem is
@@ -96,9 +127,64 @@ export default class Player{
     }
   }
 
-
+  //lKeys is a lastKeys object
   specialMovement(){
+    this.specialMovementCheck();
+    let str = '';
+    var dashingVar = false;
+    for (var i = 0; i <= 3; i++){
+      //not dashing
+      if (this.player.lastKeys[i] >= 1) {
+        this.player.lastKeys[i] -= 1;
+      }
+      //dashing
+      else if(this.player.lastKeys[i] <= -1){
+        //console.log(key);
+        this.move(i, 3);
+        dashingVar = true;
+        if(this.player.lastKeys[i] == -1){
+          dashingVar = false;
+          this.setCoolDown();
+        }
+        this.player.lastKeys[i] += 1;
+      }
+      str += i +': ' + this.player.lastKeys[i] + ' ; ';
+    }
+    //console.log(str);
+    this.player.isDashing = dashingVar;
+  }
 
+  animatePlayer(){
+    this.player.movingY = false;
+    //console.log(this.player.animArr.length);
+
+    //only if this player has animations
+    if(this.player.animArr.length == 4){
+      if (this.player.directKeys[0].isDown)
+      {
+        this.player.anims.play(this.player.animArr[this.player.directionX], true);
+        this.player.movingY = true;
+      }
+      else if (this.player.directKeys[1].isDown)
+      {
+        this.player.anims.play(this.player.animArr[this.player.directionX], true);
+        this.player.movingY = true;
+      }
+      if (this.player.directKeys[2].isDown)
+      {
+        this.player.anims.play(this.player.animArr[LEFT], true);
+        this.player.directionX = LEFT;
+      }
+      else if (this.player.directKeys[3].isDown)
+      {
+        this.player.anims.play(this.player.animArr[RIGHT], true);
+        this.player.directionX = RIGHT;
+      }
+      else if (!this.player.movingY){
+        //can't tell if something weird is going on with movement but if it is then it is here
+        this.player.anims.play(this.player.animArr[this.player.directionX + 2], true);
+      }
+    }
   }
 
   setCoolDown(){
