@@ -19,6 +19,7 @@ void setup() {
   //tiles.add(new Tile(50 + SIZE, 50, yeah2));
   //println(" " + new Tile(50 + SIZE, 50, yeah2).convertBinary());
 
+  genSquares();
   genTiles();
 }
 
@@ -69,16 +70,22 @@ String rotateForward(String str) {
 }
 
 void genTiles() {
-  //for (int x = 0; x < width; x += SIZE) {
-  //  for (int y = 0; y < height; y += SIZE) {
-  //    genTile(x, y);
-  //  }
-  //}
-  genSquares();
-  genFill();
-  genLastFill();
-  removeTiles();
-  squareEdgesFix();
+
+    //genSquares();
+
+    genFill();
+
+    genLastFill();
+
+    for(Tile t1 : tiles){
+      t1.matchNulls(getAdjTilesAll(t1)); 
+    }
+
+    removeTiles();
+
+    squareEdgesFix();
+    removeTiles();
+ 
 }
 
 void genTile(int x, int y) {
@@ -160,9 +167,10 @@ void genLastFill() {
             Tile t3 = genTile(i, j, -1);
             if (!isValidTile(t3)) {
               //fixAdjCorners(t, t2, i, j);
-            }
-            else{
-             tiles.add(t3); 
+              t.nextDiag = true;
+              t2.nextDiag = true;
+            } else {
+              tiles.add(t3);
             }
           }
         }
@@ -172,31 +180,12 @@ void genLastFill() {
 }
 
 //x and y are the position of the new Tile
-void fixAdjCorners(Tile t1, Tile t2, float x, float y){
-  if(x > t1.x){
-    if(t1.y < t2.y){
-      t1.eraseVerts(4, 5);
-      t2.eraseVerts(3, 4);
-    }
-    else{
-      t1.eraseVerts(5, 6);
-      t2.eraseVerts(6, 7);
-    }
-  }
-  else if(x < t1.x){
-    if(t1.y < t2.y){
-      t1.eraseVerts(1,2);
-      t2.eraseVerts(2,3);
-    }
-    else{
-      t1.eraseVerts(0, 1);
-      t2.eraseVerts(0, 7);
-    }
-  }
-  else if(x == t1.x){
-   //fixAdjCorners(t2, t1, x, y); 
-  }
-}
+//void fixAdjCorners(Tile t1, Tile t2, float x, float y) {
+//  t1.matchNulls(getAdjTilesAll(t1));
+//  t2.matchNulls(getAdjTilesAll(t2));
+//  t1.matchTile(getAdjTilesAll(t1));
+//  t1.matchTile(getAdjTilesAll(t1));
+//}
 
 boolean isValidTile(Tile t) {
   try {
@@ -213,8 +202,8 @@ void removeTiles() {
   for (int i = tiles.size() - 1; i >= 0; i--) {
     Tile t = tiles.get(i);
     //println(imgs.get(t.getCode()));
-    if(!isValidTile(t)){
-     tiles.remove(t); 
+    if (!isValidTile(t)) {
+      tiles.remove(t);
     }
   }
 }
@@ -305,7 +294,49 @@ Tile[] getAdjTiles(Tile t) {
   return adjTiles;
 }
 
+void clearNonSquares(){
+ for(int i = tiles.size() - 1; i >= 0; i--){
+   if(!tiles.get(i).isSquare()){
+     tiles.remove(i); 
+   }
+ }
+}
+
 void keyPressed() {
-  tiles.clear();
-  genTiles();
+
+  //genSquares();
+  //genFill();
+  //genLastFill();
+  //removeTiles();
+  //squareEdgesFix();
+
+  if (key == '1') {
+    genSquares();
+  } else if (key == '2') {
+    genFill();
+  } else if (key == '3') {
+    genLastFill();
+  } else if (key == '4') {
+    for(Tile t1 : tiles){
+      t1.matchNulls(getAdjTilesAll(t1)); 
+    }
+  } else if (key == '5') {
+    removeTiles();
+  } else if (key == '6') {
+    squareEdgesFix();
+  } else if (key == ' ') {
+    //clearNonSquares();
+    genTiles();
+  } else if (key == 'd') {
+    clearNonSquares();  
+  } else {
+    tiles.clear();
+    genTiles();
+  }
+}
+
+void mousePressed(){
+  int x = (int) (mouseX / 32) * 32;
+  int y = (int) (mouseY / 32) * 32;
+   tiles.add(new Tile(x, y, SQU));
 }

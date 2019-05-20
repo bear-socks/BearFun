@@ -3,6 +3,7 @@ class Tile {
   int x, y;
   //collection of 8 points to represent if each point is connected or not
   int[] verts;
+  boolean nextDiag = false;
   public Tile(int x_, int y_, int[] verts_) {
     x = x_;
     y = y_;
@@ -17,16 +18,20 @@ class Tile {
 
   void display() {
     fill(0, 100);
-    noFill();
-    noStroke();
+    //noFill();
+    //noStroke();
     //if (isSquare()) {
     //  fill(0, 0, 255, 100);
+    //}
+    //if (nextDiag) {
+    //  fill(0, 255, 0);
     //}
     //stroke(255, 0, 0);
     pushMatrix();
     translate(x, y);
+    //ellipse(SIZE / 2, SIZE / 2, 10, 10);
     //println(getCode());
-    image(imgs.get(getCode()), 0, 0);
+    image(imgs.get(getCode()), 0, 0);   
     beginShape();
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
@@ -75,14 +80,14 @@ class Tile {
 
     if (r == -1) {
       //corner piece
-      verts = genVerts(0, -1);
+      verts = genVerts(0, -100);
     }
     //square
     else if (r == 0) {
       verts = genVerts(0, 7);
     } else {
       int add = (int) random(1, 3);
-      int add2 = (int) random(1, 2);
+      int add2 = (int) random(0, 2);
       if (add == add2) {
         //add += 1;
       }
@@ -161,7 +166,8 @@ class Tile {
           for (int n = 4; n <= 6; n++) {
             verts[6 - n % 8] = adjT.verts[n % 8];
           }
-        } else if (i == 1) {
+        } 
+        if (i == 1) {
           for (int n = 4; n <= 6; n++) {
             verts[n] = adjT.verts[6 - n % 8];
           }
@@ -169,11 +175,13 @@ class Tile {
           //  println(verts[q] == adjT.verts[6 - q]);
           //}
           //verts = genVerts(0, 8);
-        } else if (i == 2) {
+        } 
+        if (i == 2) {
           for (int n = 6; n <= 8; n++) {
             verts[n % 8] = adjT.verts[(10 - n) % 8];
           }
-        } else if (i == 3) {
+        } 
+        if (i == 3) {
           for (int n = 6; n <= 8; n++) {
             verts[(10 - n) % 8] = adjT.verts[n % 8];
           }
@@ -184,26 +192,75 @@ class Tile {
     }
   }
 
-  void fixSquare(Tile[] adjT) {
-    int index = -1;
-    for (int i = 0; i < adjT.length; i++) {
-      if (adjT[i] == null) {
-        if (index != -1) {
-          println("ERROR FIXSQUARE");
+  //erase vertices next to empty tiles
+  void matchNulls(Tile[] tileArr) {
+    for (int i = 0; i < 4; i++) {
+      Tile adjT = tileArr[i];
+      if (adjT == null) {
+        //not sure about i == 0
+        if (i == 0) {
+          //matching up this particular side
+          for (int n = 5; n <= 5; n++) {
+            verts[6 - n % 8] = 0;
+          }
+        } 
+        if (i == 1) {
+          for (int n = 5; n <= 5; n++) {
+            verts[n] = 0;
+          }
+          //for(int q = 0; q <= 2; q++){
+          //  println(verts[q] == adjT.verts[6 - q]);
+          //}
+          //verts = genVerts(0, 8);
+        } 
+        if (i == 2) {
+          for (int n = 7; n <= 7; n++) {
+            verts[n % 8] = 0;
+          }
+        } 
+        if (i == 3) {
+          for (int n = 7; n <= 7; n++) {
+            verts[(10 - n) % 8] = 0;
+          }
         }
-        index = i;
+        //println(i);
+      }
+      //println(tileArr[i]);
+    }
+    removeIsolatedVertices();
+  }
+
+  void removeIsolatedVertices() {
+    for (int i = 0; i < 8; i++) {
+      float last = verts[(i + 8 -1) % 8];
+      float next = verts[(i + 1) % 8];
+      if (last == 0 && next == 0) {
+        verts[i] = 0;
       }
     }
+  }
+
+  void fixSquare(Tile[] adjT) {
+    for (int i = 0; i < adjT.length; i++) {
+      if (adjT[i] == null) {
+        //if (index != -1) {
+        //  println("ERROR FIXSQUARE");
+        //}
+        removeSideIndex(i);
+      }
+    }
+    removeIsolatedVertices();
+  } 
+
+  void removeSideIndex(int index) {
     //converting to the vertex coordinate 
     if (index != -1) {
-       println(index);
-      if(index == 0){
+      println(index);
+      if (index == 0) {
         index = 1;
-      }
-      else if(index == 1){
+      } else if (index == 1) {
         index = 5;
-      }
-      else if(index == 2){
+      } else if (index == 2) {
         index = 7;
       }
       //index = 3 both times
@@ -211,10 +268,9 @@ class Tile {
       println();
       verts[index] = 0;
     }
-    
   }
-  
-  void eraseVerts(int one, int two){
+
+  void eraseVerts(int one, int two) {
     verts[one] = -1;
     verts[two] = -1;
   }
