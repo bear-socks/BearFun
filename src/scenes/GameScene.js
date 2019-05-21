@@ -9,7 +9,8 @@ import treeImg from './assets/tree.png';
 import crateImg from './assets/crate.png';
 import bombImg from './assets/bomb.png';
 import redBase from './assets/redGate.png';
-import blueBase from './assets/blueGate.png'
+import blueBase from './assets/blueGate.png';
+import worm from './assets/Worm.png';
 //loading sound is not working, not sure why
 //import skyMall from './assets/skyMall.mp3';
 
@@ -44,6 +45,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('bomb', bombImg);
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
+    this.load.image('worm', worm);
     //this.load.audio('theme', skyMall);
 
   }
@@ -54,62 +56,51 @@ export default class GameScene extends Phaser.Scene {
 
     //this.add.text(50, 50, 'will like poop');
 
-    this.createWorld();
     this.createPlayer();
     this.createBases();
+    this.genWorm();
 
-    //how to click on stuff
-    // gameState.clickCrate = this.add.sprite(800, 100, 'crate');
-    // gameState.clickCrate.setInteractive();
-    // gameState.clickCrate.on('pointerup', function(){
-    //   this.x -= 20;
-    // });
 
     //https://www.youtube.com/watch?v=sYleQ1uRmjk
-    // this.items = this.add.group([
-    //   {
-    //     key: 'crate',
-    //     setXY:{
-    //       x: 100,
-    //       y: 240
-    //     }
-    //   },
-    //   {
-    //     key: 'tree',
-    //     setXY:{
-    //       x: 600,
-    //       y: 440
-    //     }
-    //   }
-    // ]);
-    //things have depth 0 by default
-    //giving these pictures depth 1 makes them above the players
-    // this.items.setDepth(1);
+
 
   }
 
-  createWorld(){
-    //this.genCrates();
-    //this.genBombs();
+  //createWorld(){
+  //this.genCrates();
+  //  this.genWorm();
+  //}
+
+  genWorm(){
+
+    //puts new worm in random place
+    function genWorm(){
+      const x = (Math.random() * (gameState.width - 200)) + 100;
+      const y = Math.random() * gameState.height;
+      gameState.worm.create(x, y, 'worm');
+    }
+
+
+    gameState.worm = this.physics.add.staticGroup();
+
+    //loop for calling worms, change delay to change span pace
+    gameState.wormGenLoop = this.time.addEvent({
+      delay: 8000,
+      callback: genWorm,
+      callbackScope: this,
+      loop: true
+    });
+
+    this.physics.add.overlap(gameState.worm, gameState.player1, (player, worm) => {
+      this.ateWorm(player, worm);
+    });
+    this.physics.add.overlap(gameState.worm, gameState.player2, (player, worm) => {
+      this.ateWorm(player, worm);
+    });
   }
 
-  //   // gameState.crates = this.physics.add.staticGroup();
 
-  //   function genBomb(){
-  //     const x = Math.random() * 1200;
-  //     const y = Math.random() * 800;
-  //     gameState.bombs.create(x, y, 'bomb').setScale(.2).setCollideWorldBounds(true);
-  //   }
-  //
-  //   gameState.bombs = this.physics.add.group();
-  //
-        //HOW TO DO SOMETHING PERIODICALLY
-  //   gameState.bombGenLoop = this.time.addEvent({
-  //     delay: 5000,
-  //     callback: genBomb,
-  //     callbackScope: this,
-  //     loop: true
-  //   });
+
   //called once
   createPlayer(p1 = true, p2 = true){
     //calls player create functions
@@ -133,7 +124,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayer1(){
-    gameState.keysPlayer1 = this.input.keyboard.createCursorKeys();
+    gameState.keysPlayer1 = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,PERIOD');
 
     //add players to one group?
     gameState.player1 = this.physics.add.sprite(gameState.width * .75, gameState.height * .5, 'blueJay');
@@ -169,7 +160,7 @@ export default class GameScene extends Phaser.Scene {
   //gameState.player1 = player1;
   //this.physics.add.collider(gameState.player1, gameState.crates);
   createPlayer2(){
-    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,S,A,D');
+    gameState.keysPlayer2 = this.input.keyboard.addKeys('W,S,A,D,Q');
     gameState.player2 = this.physics.add.sprite(gameState.width * .25, gameState.height * .5, 'cardinalR');
     gameState.player2 = new Player(gameState.player2, gameState.keysPlayer2);
     gameState.player2.functions.poop();
@@ -265,6 +256,14 @@ export default class GameScene extends Phaser.Scene {
       gameState.blueBase.open = true;
       gameState.redBase.open = false;
       gameState.redBase.anims.play('closeR', true);
+    }
+  }
+
+  //Adds points when worms are eaten
+  ateWorm(player, worm){
+    if (! player.isDashing){
+      player.wormCount += 1;
+      worm.destroy();
     }
   }
 

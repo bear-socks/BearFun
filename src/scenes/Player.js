@@ -29,7 +29,12 @@ export default class Player{
     player.coolDown = 0;
     player.speed = speed;
     player.respawnCounter = 0;
-    //not sure about these two
+
+    //worm stuff
+    player.wormCount = 0;
+    player.beserk = -1;
+
+    //these are for animation
     player.directionX = 0;
     player.movingY = false;
 
@@ -64,27 +69,45 @@ export default class Player{
     // console.log(gameState.player1.respawnCounter);
     // console.log(gameState.player2.respawnCounter);
     if (this.player.respawnCounter == -1){
-       this.player.setVelocity(0);
-       if(this.player.coolDown == 0){
-         this.movement();
-       }
-       else{
-         this.player.coolDown -= 1;
-       }
-     }
-     else if (this.player.respawnCounter == 0){
-       this.player.respawnCounter = -1;
-       this.player.functions.respawn();
-     }
-     else{
-       this.player.respawnCounter -= 1;
-     }
+      this.player.setVelocity(0);
+      if(this.player.coolDown == 0){
+        if (this.player.directKeys[4].isDown){
+          this.wormAction();
+        }
+        else {
+          this.movement();
+        }
+      }
+      else{
+        this.player.coolDown -= 1;
+      }
+
+      //ending beserk mode
+      if (this.player.beserk > 0){
+        this.player.beserk -= 1;
+      }
+      //resets from beserk mode
+      else if (this.player.beserk == 0){
+        this.player.beserk = -1;
+        this.player.setScale(1);
+        this.player.speed = speed;
+      }
+    }
+    else if (this.player.respawnCounter == 0){
+      this.player.respawnCounter = -1;
+      this.player.functions.respawn();
+    }
+    else{
+      this.player.respawnCounter -= 1;
+    }
   }
 
   movement(){
-    for(var i = 0; i <= 3; i++){
-      if (this.player.directKeys[i].isDown) {
-        this.move(i, 1);
+    if (! this.player.isDashing){
+      for(var i = 0; i <= 3; i++){
+        if (this.player.directKeys[i].isDown) {
+          this.move(i, 1);
+        }
       }
     }
     this.specialMovement();
@@ -124,12 +147,15 @@ export default class Player{
     }
     else{
       return 12;
+
     }
   }
 
   //lKeys is a lastKeys object
   specialMovement(){
-    this.specialMovementCheck();
+    if (! this.player.isDashing){
+      this.specialMovementCheck();
+    }
     let str = '';
     var dashingVar = false;
     for (var i = 0; i <= 3; i++){
@@ -144,7 +170,9 @@ export default class Player{
         dashingVar = true;
         if(this.player.lastKeys[i] == -1){
           dashingVar = false;
-          this.setCoolDown();
+          if (this.player.beserk < 0){
+            this.setCoolDown();
+          }
         }
         this.player.lastKeys[i] += 1;
       }
@@ -201,6 +229,7 @@ export default class Player{
     //stops the dashing
     this.player.lastKeys = {};
     this.addScore(1);
+    otherPlayer.wormCount -= 1;
 
     //something weird was going on with this line below
     otherPlayer.respawnCounter = 100;
@@ -217,12 +246,28 @@ export default class Player{
     this.player.scoreText.setText(`${this.player.score}`);
   }
 
+//Power ups from the worms
+//Currently only beserk mode
+  wormAction(){
+    if (this.player.wormCount >= 3){
+        this.beserk();
+      }
+  }
+
+//Gets big and fast
+  beserk(){
+    this.player.wormCount -= 3;
+    this.player.setScale(2);
+    this.player.speed = speed * 1.5;
+    this.player.beserk = 180;
+  }
+
   poop(){
     console.log(this.player.keys);
 
     this.player.keys.forEach(function(key,index) {
-    // key: the name of the object key
-    // index: the ordinal position of the key within the object
+      // key: the name of the object key
+      // index: the ordinal position of the key within the object
       console.log(index + ' ' + key)
     });
 

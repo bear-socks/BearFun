@@ -12,7 +12,7 @@ export default {
 	        debug: false
 	    }
 	},
-  //backgroundColor: "#320193",
-  backgroundColor: "#ddd6ce",
+  backgroundColor: "#5ba563",
+  //backgroundColor: "#ddd6ce",
   pixelArt: true
 };
