@@ -2,12 +2,10 @@ import 'phaser';
 
 //importing player class
 import Player from "./Player.js"
+import Base from "./Base.js"
 
 import cardinalRImg from './assets/cardinalRight.png';
 import blueJay from './assets/blueJay.png'
-import treeImg from './assets/tree.png';
-import crateImg from './assets/crate.png';
-import bombImg from './assets/bomb.png';
 import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
 import worm from './assets/Worm.png';
@@ -19,11 +17,6 @@ import worm from './assets/Worm.png';
 var gameState = {};
 gameState.width = 1200;
 gameState.height = 800;
-//the speed of each player
-gameState.speed = 200;
-
-var LEFT = 0;
-var RIGHT = 1;
 
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
@@ -39,67 +32,21 @@ export default class GameScene extends Phaser.Scene {
     //this.load.image('cardinalR', './assets/logo.png');
     this.load.image('cardinalR', cardinalRImg);
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
-    //this.load.image('blueJayR', blueRImg);
-    this.load.image('crate', crateImg);
-    this.load.image('tree', treeImg);
-    this.load.image('bomb', bombImg);
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
     this.load.image('worm', worm);
     //this.load.audio('theme', skyMall);
-
   }
 
   create(){
 
     gameState.keysText = this.add.text(300, 100, '');
-
     //this.add.text(50, 50, 'will like poop');
-
     this.createPlayer();
     this.createBases();
     this.genWorm();
 
-
-    //https://www.youtube.com/watch?v=sYleQ1uRmjk
-
-
   }
-
-  //createWorld(){
-  //this.genCrates();
-  //  this.genWorm();
-  //}
-
-  genWorm(){
-
-    //puts new worm in random place
-    function genWorm(){
-      const x = (Math.random() * (gameState.width - 200)) + 100;
-      const y = Math.random() * gameState.height;
-      gameState.worm.create(x, y, 'worm');
-    }
-
-
-    gameState.worm = this.physics.add.staticGroup();
-
-    //loop for calling worms, change delay to change span pace
-    gameState.wormGenLoop = this.time.addEvent({
-      delay: 8000,
-      callback: genWorm,
-      callbackScope: this,
-      loop: true
-    });
-
-    this.physics.add.overlap(gameState.worm, gameState.player1, (player, worm) => {
-      this.ateWorm(player, worm);
-    });
-    this.physics.add.overlap(gameState.worm, gameState.player2, (player, worm) => {
-      this.ateWorm(player, worm);
-    });
-  }
-
-
 
   //called once
   createPlayer(p1 = true, p2 = true){
@@ -166,50 +113,55 @@ export default class GameScene extends Phaser.Scene {
     gameState.player2.functions.poop();
   }
 
-
   //creates the bases for both teams. Open when a player dies.
   createBases(){
-    gameState.redBase = this.physics.add.sprite(0, 0, 'redBase');
-    gameState.redBase.setPosition(0, gameState.height / 2);
-    gameState.redBase.open = false;
-    gameState.redBase.setImmovable(true);
-    this.anims.create({
+    var animArrRed = [];
+    var redBase = this.physics.add.sprite(0, gameState.height / 2, 'redBase');
+    redBase.setImmovable(true);
+
+    animArrRed[1] = this.anims.create({
       key: 'openR',
       frames: this.anims.generateFrameNumbers('redBase', { start: 1, end: 1 }),
       frameRate: 10,
       repeat: 1
     });
-    this.anims.create({
+    animArrRed[0] = this.anims.create({
       key: 'closeR',
       frames: this.anims.generateFrameNumbers('redBase', { start: 0, end: 0 }),
       frameRate: 10,
       repeat: 1
     });
-    this.physics.add.collider(gameState.player1, gameState.redBase, () => {
-      if (gameState.redBase.open){
+
+    gameState.player2.base = new Base(redBase, animArrRed);
+
+    this.physics.add.collider(gameState.player1, gameState.player2.base.sprite, () => {
+      if (gameState.player2.base.isOpen){
         gameState.player1.functions.addScore(3);
         gameState.player1.functions.respawn();
       }
     })
 
-    gameState.blueBase = this.physics.add.sprite(0, 0, 'blueBase');
-    gameState.blueBase.setPosition(gameState.width, gameState.height / 2);
-    gameState.blueBase.open = false;
-    gameState.blueBase.setImmovable(true);
-    this.anims.create({
+
+    var blueBase = this.physics.add.sprite(gameState.width, gameState.height / 2, 'blueBase');
+    blueBase.setImmovable(true);
+    var animArrBlue = [];
+    animArrBlue[1] = this.anims.create({
       key: 'openB',
       frames: this.anims.generateFrameNumbers('blueBase', { start: 1, end: 1 }),
       frameRate: 10,
       repeat: 1
     });
-    this.anims.create({
+    animArrBlue[0] = this.anims.create({
       key: 'closeB',
       frames: this.anims.generateFrameNumbers('blueBase', { start: 0, end: 0 }),
       frameRate: 10,
       repeat: 1
     });
-    this.physics.add.collider(gameState.player2, gameState.blueBase, () => {
-      if (gameState.blueBase.open){
+
+    gameState.player1.base = new Base(blueBase, animArrBlue);
+
+    this.physics.add.collider(gameState.player2,  gameState.player1.base.sprite, () => {
+      if (gameState.player1.base.isOpen){
         gameState.player2.functions.addScore(3);
         gameState.player2.functions.respawn();
       }
@@ -227,6 +179,34 @@ export default class GameScene extends Phaser.Scene {
     gameState.player2.scoreText.setDepth(1);
   }
 
+  genWorm(){
+
+    //puts new worm in random place
+    function genWorm(){
+      const x = (Math.random() * (gameState.width - 200)) + 100;
+      const y = Math.random() * gameState.height;
+      gameState.worm.create(x, y, 'worm');
+    }
+
+
+    gameState.worm = this.physics.add.staticGroup();
+
+    //loop for calling worms, change delay to change span pace
+    gameState.wormGenLoop = this.time.addEvent({
+      delay: 8000,
+      callback: genWorm,
+      callbackScope: this,
+      loop: true
+    });
+
+    this.physics.add.overlap(gameState.worm, gameState.player1, (player, worm) => {
+      this.ateWorm(player, worm);
+    });
+    this.physics.add.overlap(gameState.worm, gameState.player2, (player, worm) => {
+      this.ateWorm(player, worm);
+    });
+  }
+
   getOtherPlayer(player){
     if(player == gameState.player1){
       return gameState.player2;
@@ -237,25 +217,21 @@ export default class GameScene extends Phaser.Scene {
   }
 
   gotBeaked(){
-    if (gameState.player1.isDashing){
+    if(gameState.player1.isDashing && gameState.player2.isDashing){
       gameState.player1.functions.kill(gameState.player2);
-      gameState.player2.respawnCounter = 100;
-      //opens red base
-      gameState.redBase.anims.play('openR', true);
-      gameState.redBase.open = true;
-      gameState.blueBase.open = false;
-      gameState.blueBase.anims.play('closeB', true);
-    }
-    if (gameState.player2.isDashing){
-
       gameState.player2.functions.kill(gameState.player1);
-      gameState.player1.respawnCounter = 100;
 
-      //opens blue base
-      gameState.blueBase.anims.play('openB', true);
-      gameState.blueBase.open = true;
-      gameState.redBase.open = false;
-      gameState.redBase.anims.play('closeR', true);
+      //watch out here, kill also affects whether bases are open, could make a separate kill function for a tie
+      gameState.player1.base.setOpen(true);
+      gameState.player2.base.setOpen(true);
+    }
+    else{
+      if (gameState.player1.isDashing){
+        gameState.player1.functions.kill(gameState.player2);
+      }
+      if (gameState.player2.isDashing){
+        gameState.player2.functions.kill(gameState.player1);
+      }
     }
   }
 

@@ -9,8 +9,8 @@
 //   player1 = new Player(player1);
 //   player1.functions.move();
 
-//ADD IN A PLAYERS BASE
-var speed = 200;
+//this variables get imoprted with the player class
+var SPEED = 400;
 
 var LEFT = 0;
 var RIGHT = 1;
@@ -27,12 +27,12 @@ export default class Player{
     player.scale = 1;
     player.bounce = .2;
     player.coolDown = 0;
-    player.speed = speed;
+    player.speed = SPEED;
     player.respawnCounter = 0;
 
     //worm stuff
     player.wormCount = 0;
-    player.beserk = -1;
+    player.berserk = -1;
 
     //these are for animation
     player.directionX = 0;
@@ -54,6 +54,7 @@ export default class Player{
     //keeps a pointer to this actual object
     player.functions = this;
 
+    player.base;
 
     player.setCollideWorldBounds(true);
     player.setScale(player.scale);
@@ -71,6 +72,7 @@ export default class Player{
     if (this.player.respawnCounter == -1){
       this.player.setVelocity(0);
       if(this.player.coolDown == 0){
+        //period or q
         if (this.player.directKeys[4].isDown){
           this.wormAction();
         }
@@ -82,15 +84,15 @@ export default class Player{
         this.player.coolDown -= 1;
       }
 
-      //ending beserk mode
-      if (this.player.beserk > 0){
-        this.player.beserk -= 1;
+      //ending berserk mode
+      if (this.player.berserk > 0){
+        this.player.berserk -= 1;
       }
-      //resets from beserk mode
-      else if (this.player.beserk == 0){
-        this.player.beserk = -1;
+      //resets from berserk mode
+      else if (this.player.berserk == 0){
+        this.player.berserk = -1;
         this.player.setScale(1);
-        this.player.speed = speed;
+        this.player.speed = SPEED;
       }
     }
     else if (this.player.respawnCounter == 0){
@@ -170,7 +172,7 @@ export default class Player{
         dashingVar = true;
         if(this.player.lastKeys[i] == -1){
           dashingVar = false;
-          if (this.player.beserk < 0){
+          if (this.player.berserk < 0){
             this.setCoolDown();
           }
         }
@@ -239,6 +241,9 @@ export default class Player{
     //could cause a problem with both characters dying at the same time and going to the same position
     //so put in the random initX value
     otherPlayer.setPosition(-1000, this.initX);
+
+    otherPlayer.functions.setBaseOpen(true);
+    this.setBaseOpen(false);
   }
 
   addScore(num){
@@ -246,20 +251,24 @@ export default class Player{
     this.player.scoreText.setText(`${this.player.score}`);
   }
 
+  setBaseOpen(b){
+    this.player.base.setOpen(b);
+  }
+
 //Power ups from the worms
-//Currently only beserk mode
+//Currently only berserk mode
   wormAction(){
     if (this.player.wormCount >= 3){
-        this.beserk();
+        this.berserk();
       }
   }
 
 //Gets big and fast
-  beserk(){
+  berserk(){
     this.player.wormCount -= 3;
     this.player.setScale(2);
-    this.player.speed = speed * 1.5;
-    this.player.beserk = 180;
+    this.player.speed = SPEED * 1.5;
+    this.player.berserk = 180;
   }
 
   poop(){
