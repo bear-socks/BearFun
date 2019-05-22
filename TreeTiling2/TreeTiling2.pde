@@ -1,7 +1,6 @@
 ArrayList<Tile> tiles;
 int SIZE = 32;
 
-int SQU = 0;
 
 //can be a regular array
 HashMap<String, PImage> imgs = new HashMap<String, PImage>();
@@ -19,8 +18,8 @@ void setup() {
   //tiles.add(new Tile(50 + SIZE, 50, yeah2));
   //println(" " + new Tile(50 + SIZE, 50, yeah2).convertBinary());
 
-  genSquares();
-  genTiles();
+  //genSquares();
+  //genTiles();
 }
 
 void loadImages() {
@@ -69,115 +68,29 @@ String rotateForward(String str) {
   return newStr;
 }
 
-void genTiles() {
 
-    //genSquares();
+//void genTile(int x, int y) {
+//  //int[] sides = new int[8];
+//  float r = random(8);
+//  genTile(x, y, r, r);
+//}
 
-    genFill();
+//Tile genTile(int x, int y, float rMin, float rMax) {
+//  //int[] sides = new int[8];
+//  float r = random(rMin, rMax);
+//  Tile t = genTile(x, y, r);
+//  return t;
+//}
 
-    genLastFill();
+//Tile genTile(int x, int y, float r) {
+//  //int[] sides = new int[8];
+//  Tile t = new Tile(x, y, r);
+//  Tile[] tileArr = getAdjTiles(t);
+//  t.matchTile(tileArr);
+//  return t;
+//}
 
-    for(Tile t1 : tiles){
-      t1.matchNulls(getAdjTilesAll(t1)); 
-    }
 
-    removeTiles();
-
-    squareEdgesFix();
-    removeTiles();
- 
-}
-
-void genTile(int x, int y) {
-  //int[] sides = new int[8];
-  float r = random(8);
-  genTile(x, y, r, r);
-}
-
-Tile genTile(int x, int y, float rMin, float rMax) {
-  //int[] sides = new int[8];
-  float r = random(rMin, rMax);
-  Tile t = genTile(x, y, r);
-  return t;
-}
-
-Tile genTile(int x, int y, float r) {
-  //int[] sides = new int[8];
-  Tile t = new Tile(x, y, r);
-  Tile[] tileArr = getAdjTiles(t);
-  t.matchTile(tileArr);
-  return t;
-}
-
-void genSquares() {
-  //0 = a full square
-  for (int i = 0; i < 5; i++) {
-    for (int j = 0; j < 1; j += 1) {
-      tiles.add(new Tile(320 + i * 32, 320 + 32 * j, SQU));
-    }
-  }
-}
-
-void genFill() {
-  for (int i = tiles.size() - 1; i >= 0; i--) {
-    Tile t = tiles.get(i);
-    //create edges of the trees
-    if (t.isSquare()) {
-      int num = 1;
-      for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
-        int newX = t.x + x;
-        if (!containsSquare(newX, t.y)) {
-          tiles.add(genTile(newX, t.y, num));
-        }
-        num++;
-      }
-      for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
-        int newY = t.y + y;
-        if (!containsSquare(t.x, newY)) {
-          tiles.add(genTile(t.x, newY, num));
-        }
-        num++;
-      }
-    }
-  }
-}
-
-void genLastFill() {
-  //find diaganols and fill in
-
-  for (int m = tiles.size() - 1; m >= 0; m--) {
-    Tile t = tiles.get(m);
-    for (int n = tiles.size() - 1; n >= 0; n--) {
-      Tile t2 = tiles.get(n);
-      if (t2 != t) {
-        int x = (t.x - t2.x);
-        int y = (t.y - t2.y);
-        if (abs(x) == abs(y) && abs(y) == SIZE) {
-          //the tiles are diagonal from eachother
-          int i = 0;
-          int j = 0;
-          if (!contains(t.x, t2.y)) {
-            i = t.x;
-            j = t2.y;
-          } else if (!contains(t2.x, t.y)) {
-            i = t2.x;
-            j = t.y;
-          }
-          if (i != 0 && j != 0) {
-            Tile t3 = genTile(i, j, -1);
-            if (!isValidTile(t3)) {
-              //fixAdjCorners(t, t2, i, j);
-              t.nextDiag = true;
-              t2.nextDiag = true;
-            } else {
-              tiles.add(t3);
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 //x and y are the position of the new Tile
 //void fixAdjCorners(Tile t1, Tile t2, float x, float y) {
@@ -294,12 +207,107 @@ Tile[] getAdjTiles(Tile t) {
   return adjTiles;
 }
 
-void clearNonSquares(){
- for(int i = tiles.size() - 1; i >= 0; i--){
-   if(!tiles.get(i).isSquare()){
-     tiles.remove(i); 
-   }
- }
+void clearNonSquares() {
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    if (!tiles.get(i).isSquare()) {
+      tiles.remove(i);
+    }
+  }
+}
+
+///////////////////////////////THE NEW WORLD
+
+//1
+void genSquares() {
+  //0 = a full square
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 1; j += 1) {
+      tiles.add(new Tile(320 + i * 32, 320 + 32 * j, SQU));
+    }
+  }
+}
+
+//2
+//find sides and wedges of the trees
+void findSidesWedges() {
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    Tile t = tiles.get(i);
+
+    if (t.isSquare()) {
+      int num = 1;
+      for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
+        int newX = t.x + x;
+        if (!contains(newX, t.y)) {
+          genTilePlace(newX, t.y);
+        }
+      }
+      for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
+        int newY = t.y + y;
+        if (!contains(t.x, newY)) {
+          genTilePlace(t.x, newY);
+        }
+      }
+    }
+  }
+}
+
+//3
+void deleteSides() {
+}
+
+//4
+void findCorners() {
+}
+
+//5
+void genCorners() {
+}
+
+//6
+void genSides() {
+}
+
+//7
+void matchSides() {
+}
+
+//8
+void matchWedges() {
+}
+
+/////////////// New helpers
+
+void genTilePlace(int x, int y) {
+  int type = squareOrWedge(x, y);
+  if (type != -1) {
+    tiles.add(new Tile(x, y, type));
+  }
+}
+
+int squareOrWedge(int x1, int y1) {
+  int numX = 0;
+  int numY = 0;
+  for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
+    int newX = x1 + x;
+    if (containsSquare(newX, y1)) {
+      numX++;
+    }
+  }
+  for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
+    int newY = y1 + y;
+    if (containsSquare(x1, newY)) {
+      numY++;
+    }
+  }
+  //this should not be a tile
+  if (numX == 2 || numY == 2) {
+    return -1;
+  }
+  if (numX + numY == 1) {
+    return SIDE;
+  } else {
+    return WEDGE;
+  }
 }
 
 void keyPressed() {
@@ -313,30 +321,30 @@ void keyPressed() {
   if (key == '1') {
     genSquares();
   } else if (key == '2') {
-    genFill();
+    findSidesWedges();
   } else if (key == '3') {
-    genLastFill();
+    deleteSides();
   } else if (key == '4') {
-    for(Tile t1 : tiles){
-      t1.matchNulls(getAdjTilesAll(t1)); 
-    }
+    findCorners();
   } else if (key == '5') {
-    removeTiles();
+    genCorners();
   } else if (key == '6') {
-    squareEdgesFix();
+    genSides();
+  } else if (key == '7') {
+    matchSides();
+  } else if (key == '8') {
+    matchWedges();
   } else if (key == ' ') {
     //clearNonSquares();
-    genTiles();
   } else if (key == 'd') {
-    clearNonSquares();  
+    clearNonSquares();
   } else {
     tiles.clear();
-    genTiles();
   }
 }
 
-void mousePressed(){
+void mousePressed() {
   int x = (int) (mouseX / 32) * 32;
   int y = (int) (mouseY / 32) * 32;
-   tiles.add(new Tile(x, y, SQU));
+  tiles.add(new Tile(x, y, SQU));
 }

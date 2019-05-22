@@ -33,7 +33,6 @@ export default class Player{
     //worm stuff
     player.wormCount = 0;
     player.berserk = -1;
-    player.hasPriority = false;
 
     //these are for animation
     player.directionX = 0;
@@ -94,7 +93,6 @@ export default class Player{
         this.player.berserk = -1;
         this.player.setScale(1);
         this.player.speed = SPEED;
-        this.player.hasPriority = false;
       }
     }
     else if (this.player.respawnCounter == 0){
@@ -233,9 +231,7 @@ export default class Player{
     //stops the dashing
     this.player.lastKeys = {};
     this.addScore(1);
-    if (otherPlayer.wormCount > 0){
-      otherPlayer.wormCount -= 1;
-    }
+    otherPlayer.wormCount -= 1;
 
     //something weird was going on with this line below
     otherPlayer.respawnCounter = 100;
@@ -273,7 +269,6 @@ export default class Player{
     this.player.setScale(2);
     this.player.speed = SPEED * 1.5;
     this.player.berserk = 180;
-    this.player.hasPriority = true;
   }
 
   poop(){

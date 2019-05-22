@@ -1,23 +1,58 @@
 
+int CORN = 0;
+int SIDE = 1;
+int WEDGE = 2;
+int SQU = 3;
+
 class Tile {
   int x, y;
   //collection of 8 points to represent if each point is connected or not
   int[] verts;
   boolean nextDiag = false;
+  
+  //////////////////// NEW
+  int type;
+  
   public Tile(int x_, int y_, int[] verts_) {
     x = x_;
     y = y_;
     verts = verts_;
   }
 
-  public Tile(int x_, int y_, float sideNum) {
+  //public Tile(int x_, int y_, float sideNum) {
+  //  x = x_;
+  //  y = y_;
+  //  verts = genVerts(sideNum);
+  //}
+  
+  public Tile(int x_, int y_, int type_) {
     x = x_;
     y = y_;
-    verts = genVerts(sideNum);
+    type = type_;
+    //a square placeholder for now
+    //verts = genVerts(0);
+  }
+
+  void setColor(){
+   if(type == CORN){
+    fill(255, 0, 255); 
+   }
+   else if(type == SIDE){
+    fill(255, 0, 0);
+   }
+   else if(type == WEDGE){
+    fill(0, 255, 0); 
+   }
+   else if(type == SQU){
+    fill(0, 0, 255); 
+   }
+   else{
+    fill(0); 
+   }
   }
 
   void display() {
-    fill(0, 100);
+    setColor();
     //noFill();
     //noStroke();
     //if (isSquare()) {
@@ -29,17 +64,17 @@ class Tile {
     //stroke(255, 0, 0);
     pushMatrix();
     translate(x, y);
-    //ellipse(SIZE / 2, SIZE / 2, 10, 10);
+    ellipse(SIZE / 2, SIZE / 2, 10, 10);
     //println(getCode());
-    image(imgs.get(getCode()), 0, 0);   
-    beginShape();
-    //verts starts at top left and goes ccw
-    for (int i = 0; i < 8; i++) {
-      if (verts[i] == 1) {
-        placeVertex(i);
-      }
-    }
-    endShape(CLOSE);
+    //image(imgs.get(getCode()), 0, 0);   
+    //beginShape();
+    ////verts starts at top left and goes ccw
+    //for (int i = 0; i < 8; i++) {
+    //  if (verts[i] == 1) {
+    //    placeVertex(i);
+    //  }
+    //}
+    //endShape(CLOSE);
     popMatrix();
   }
 
@@ -146,13 +181,14 @@ class Tile {
   }
 
   boolean isSquare() {
-    for (int n : verts) {
-      //print(n);
-      if (n == 0) {
-        return false;
-      }
-    }
-    return true;
+    //for (int n : verts) {
+    //  //print(n);
+    //  if (n == 0) {
+    //    return false;
+    //  }
+    //}
+    //return true;
+    return type == SQU;
   }
 
   //0 = left, 1 = right, 2 = top, 3 = bottom

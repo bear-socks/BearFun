@@ -1,5 +1,5 @@
-#Join the discord!
-https://discord.gg/5a39b2
+# Join the discord!
+https://discord.gg/UJ5wNXx
 
 # Phaser 3 Webpack Project Template
 
