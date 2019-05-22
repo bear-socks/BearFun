@@ -8,7 +8,7 @@ import cardinalRImg from './assets/cardinalRight.png';
 import blueJay from './assets/blueJay.png'
 import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
-import worm from './assets/Worm.png';
+import worm from './assets/worm.png';
 //loading sound is not working, not sure why
 //import skyMall from './assets/skyMall.mp3';
 
@@ -34,7 +34,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
-    this.load.image('worm', worm);
+    this.load.spritesheet('worm', worm, {frameWidth: 6, frameHeight: 15});
+    //this.load.image('worm', worm);
     //this.load.audio('theme', skyMall);
   }
 
@@ -186,6 +187,8 @@ export default class GameScene extends Phaser.Scene {
       const x = (Math.random() * (gameState.width - 200)) + 100;
       const y = Math.random() * gameState.height;
       gameState.worm.create(x, y, 'worm');
+      gameState.worm.playAnimation(gameState.worm.animArr[0]);
+      //this.anims.play(gameState.worm.animArr[0], true);
     }
 
     gameState.worm = this.physics.add.staticGroup();
@@ -197,6 +200,15 @@ export default class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true
     });
+
+    gameState.worm.animArr = []
+    gameState.worm.animArr[0] = this.anims.create({
+      key: 'wormDance',
+      frames: [ { key: 'worm', frame: 0 }, { key: 'worm', frame: 1 } ],
+      frameRate: 4,
+      repeat: -1
+    });
+
 
     this.physics.add.overlap(gameState.worm, gameState.player1, (player, worm) => {
       this.ateWorm(player, worm);
@@ -217,12 +229,23 @@ export default class GameScene extends Phaser.Scene {
 
   gotBeaked(){
     if(gameState.player1.isDashing && gameState.player2.isDashing){
-      gameState.player1.functions.kill(gameState.player2);
-      gameState.player2.functions.kill(gameState.player1);
+      if(gameState.player1.hasPriority && gameState.player2.hasPriority){
+        gameState.player1.functions.kill(gameState.player2);
+        gameState.player2.functions.kill(gameState.player1);
 
-      //watch out here, kill also affects whether bases are open, could make a separate kill function for a tie
-      gameState.player1.base.setOpen(true);
-      gameState.player2.base.setOpen(true);
+        //watch out here, kill also affects whether bases are open, could make a separate kill function for a tie
+        gameState.player1.base.setOpen(true);
+        gameState.player2.base.setOpen(true);
+      }
+      if(! gameState.player2.hasPriority){
+        gameState.player1.functions.kill(gameState.player2);
+        gameState.player2.base.setOpen(true);
+      }
+      if(! gameState.player1.hasPriority){
+        gameState.player2.functions.kill(gameState.player1);
+        gameState.player1.base.setOpen(true);
+      }
+
     }
     else{
       if (gameState.player1.isDashing){
