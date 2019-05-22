@@ -188,7 +188,6 @@ export default class GameScene extends Phaser.Scene {
       gameState.worm.create(x, y, 'worm');
     }
 
-
     gameState.worm = this.physics.add.staticGroup();
 
     //loop for calling worms, change delay to change span pace
