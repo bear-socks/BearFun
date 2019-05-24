@@ -232,7 +232,7 @@ export default class Player{
     this.player.lastKeys = {};
     this.addScore(1);
     if(otherPlayer.wormCount > 0){
-      otherPlayer.function.addWorms(-1);
+      otherPlayer.functions.addWorms(-1);
     }
 
     //something weird was going on with this line below
