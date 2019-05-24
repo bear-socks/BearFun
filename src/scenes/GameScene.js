@@ -117,7 +117,7 @@ export default class GameScene extends Phaser.Scene {
   //creates the bases for both teams. Open when a player dies.
   createBases(){
     var animArrRed = [];
-    var redBase = this.physics.add.sprite(0, gameState.height / 2, 'redBase');
+    var redBase = this.physics.add.sprite(0, gameState.height / 2, 'redBase').setScale(.5);
     redBase.setImmovable(true);
 
     animArrRed[1] = this.anims.create({
@@ -143,7 +143,7 @@ export default class GameScene extends Phaser.Scene {
     })
 
 
-    var blueBase = this.physics.add.sprite(gameState.width, gameState.height / 2, 'blueBase');
+    var blueBase = this.physics.add.sprite(gameState.width, gameState.height / 2, 'blueBase').setScale(.5);
     blueBase.setImmovable(true);
     var animArrBlue = [];
     animArrBlue[1] = this.anims.create({
@@ -172,12 +172,18 @@ export default class GameScene extends Phaser.Scene {
   createPlayerText(){
     gameState.player1.scoreText = this.add.text(1050, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
+
+    gameState.player1.wormText = this.add.text(1050, 100, '0', { fontSize: '25px',
+    fill: '#FFFFFF'});
     //score goes in front of players
     gameState.player1.scoreText.setDepth(1);
 
     gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
     gameState.player2.scoreText.setDepth(1);
+
+    gameState.player2.wormText = this.add.text(100, 100, '0', { fontSize: '25px',
+    fill: '#FFFFFF'});
   }
 
   genWorm(){
@@ -229,23 +235,23 @@ export default class GameScene extends Phaser.Scene {
 
   gotBeaked(){
     if(gameState.player1.isDashing && gameState.player2.isDashing){
-      if(gameState.player1.hasPriority && gameState.player2.hasPriority){
+      //console.log("bob" + gameState.player1.hasPriority);
+      if((gameState.player1.hasPriority && gameState.player2.hasPriority) || (!gameState.player1.hasPriority && !gameState.player2.hasPriority)){
         gameState.player1.functions.kill(gameState.player2);
         gameState.player2.functions.kill(gameState.player1);
 
         //watch out here, kill also affects whether bases are open, could make a separate kill function for a tie
-        gameState.player1.base.setOpen(true);
-        gameState.player2.base.setOpen(true);
+        gameState.player1.functions.setBaseOpen(false);
+        gameState.player2.functions.setBaseOpen(false);
       }
-      if(! gameState.player2.hasPriority){
-        gameState.player1.functions.kill(gameState.player2);
-        gameState.player2.base.setOpen(true);
+      else{
+        if(!gameState.player2.hasPriority){
+          gameState.player1.functions.kill(gameState.player2);
+        }
+        if(!gameState.player1.hasPriority){
+          gameState.player2.functions.kill(gameState.player1);
+        }d
       }
-      if(! gameState.player1.hasPriority){
-        gameState.player2.functions.kill(gameState.player1);
-        gameState.player1.base.setOpen(true);
-      }
-
     }
     else{
       if (gameState.player1.isDashing){
@@ -259,10 +265,10 @@ export default class GameScene extends Phaser.Scene {
 
   //Adds points when worms are eaten
   ateWorm(player, worm){
-    if (! player.isDashing){
-      player.wormCount += 1;
-      worm.destroy();
-    }
+    //if (!player.isDashing){
+      player.functions.addWorms(1);
+      worm.destroy();// DEBUG:
+    //}
   }
 
   //do everything necessary to restart the game

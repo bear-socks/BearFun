@@ -29,13 +29,13 @@ class Tile {
     x = x_;
     y = y_;
     type = type_;
-    //a square placeholder for now
-    //verts = genVerts(0);
+    //an empty placeholder for now
+    verts = genVerts(-1);
   }
 
   void setColor(){
    if(type == CORN){
-    fill(255, 0, 255); 
+    fill(155, 100, 55); 
    }
    else if(type == SIDE){
     fill(255, 0, 0);
@@ -67,14 +67,14 @@ class Tile {
     ellipse(SIZE / 2, SIZE / 2, 10, 10);
     //println(getCode());
     //image(imgs.get(getCode()), 0, 0);   
-    //beginShape();
-    ////verts starts at top left and goes ccw
-    //for (int i = 0; i < 8; i++) {
-    //  if (verts[i] == 1) {
-    //    placeVertex(i);
-    //  }
-    //}
-    //endShape(CLOSE);
+    beginShape();
+    //verts starts at top left and goes ccw
+    for (int i = 0; i < 8; i++) {
+      if (verts[i] == 1) {
+        placeVertex(i);
+      }
+    }
+    endShape(CLOSE);
     popMatrix();
   }
 
@@ -114,7 +114,7 @@ class Tile {
 
 
     if (r == -1) {
-      //corner piece
+      //no verticies
       verts = genVerts(0, -100);
     }
     //square
@@ -169,8 +169,8 @@ class Tile {
 
   int[] rotation(int[] verts, int r) {
     int[] nVert = new int[8];
-    for (int i = r; i < r + nVert.length; i++) {
-      nVert[i % nVert.length] = verts[i - r];
+    for (int i = r + nVert.length; i < r + nVert.length * 2; i++) {
+      nVert[i % nVert.length] = verts[(i - r) % nVert.length];
     }
     return nVert;
   }

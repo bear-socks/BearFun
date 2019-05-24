@@ -54,6 +54,7 @@ void addImg(String str) {
 
 void draw() {
   //noLoop();
+  //translate(50, 50);
   background(255);
   for (Tile t : tiles) {
     t.display();
@@ -129,25 +130,6 @@ void squareEdgesFix() {
   }
 }
 
-boolean containsSquare(int x, int y) {
-  for (Tile t : tiles) {
-    if (t.isSquare()) {
-      if (t.x == x && t.y == y) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-boolean contains(int x, int y) {
-  for (Tile t : tiles) {
-    if (t.x == x && t.y == y) {
-      return true;
-    }
-  }
-  return false;
-}
 
 //returns adjacent tiles (square or non-square)
 //0 = left, 1 = right, 2 = top, 3 = bottom
@@ -252,15 +234,101 @@ void findSidesWedges() {
 }
 
 //3
+//delete sides that are adjacenet with squares on opposite sides
+//in the future could make these half sides
 void deleteSides() {
+  PVector dir;
+  //println(tiles.size() - 1);
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    //println(tiles.size());
+    Tile side = tiles.get(i);
+    if (sideOrWedge(side) == SIDE) {
+      dir = getDirectionOfSquareSide(side);
+      //going in the opposite direction of the square
+      //need to set equals again? don't think so
+      //println(dir.x, dir.y);
+      dir.mult(-1);
+      //these should be ints anyway
+      //println(dir.x, dir.y);
+      int x = side.x + (int) dir.x;
+      int y = side.y + (int) dir.y;
+      if (containsSide(x, y)) {
+        //println("yer");
+        //go one more in this direction
+        x += (int) dir.x;
+        y += (int) dir.y;
+        if (containsSquare(x, y)) {
+          //remove both of these sides
+          //println("yee");
+          removeTile(side);
+          removeTile(x - (int) dir.x, y - (int) dir.y);
+          i--;
+        }
+      }
+    }
+  }
 }
 
 //4
+//something is messed up here
 void findCorners() {
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    Tile s1 = tiles.get(i);
+    if (isSideOrWedge(s1)) {
+      for (int j = tiles.size() - 1; j >= 0; j--) {
+        Tile s2 = tiles.get(j);
+        if (s2 != s1 && isSideOrWedge(s2)) {
+          int x = (s1.x - s2.x);
+          int y = (s1.y - s2.y);
+          if (abs(x) == abs(y) && abs(y) == SIZE) {
+            //the tiles are diagonal from eachother
+            //here, not sure what is going on
+            int m = -1;
+            int n = -1;
+            if (!contains(s1.x, s2.y)) {
+              m = s1.x;
+              n = s2.y;
+            } else if (!contains(s2.x, s1.y)) {
+              m = s2.x;
+              n = s1.y;
+            }
+            if (m != -1 || n != -1) {
+              genCornerPlace(m, n);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 //5
 void genCorners() {
+  for (Tile t : tiles) {
+    if (t.type == CORN) {
+      PVector dir = getDirOfCornSquare(t);
+      float r = random(1);
+      if (r < 0) {
+        //empty tile
+        t.verts = t.genVerts(-1);
+      } else {
+        //1 or 2
+        int left = (int) random(1, 3); 
+        int bot = (int) random(1, 3); 
+        //left side
+        for (int i = 2; i >= 2 - left; i--) {
+          t.verts[i] = 1;
+        }
+        //bottom side
+        t.verts[3] = 1;
+        if (bot == 2) {
+          t.verts[4] = 1;
+        }
+
+        rotateCorner(t, dir);
+      }
+    }
+  }
 }
 
 //6
@@ -278,13 +346,29 @@ void matchWedges() {
 /////////////// New helpers
 
 void genTilePlace(int x, int y) {
-  int type = squareOrWedge(x, y);
+  int type = sideOrWedge(x, y);
   if (type != -1) {
-    tiles.add(new Tile(x, y, type));
+    if (!contains(x, y)) {
+      tiles.add(new Tile(x, y, type));
+    }
   }
 }
 
-int squareOrWedge(int x1, int y1) {
+void genCornerPlace(int x, int y) {
+  if (!contains(x, y)) {
+    tiles.add(new Tile(x, y, CORN));
+  }
+}
+
+boolean isSideOrWedge(Tile t) {
+  return t.type == SIDE || t.type == WEDGE;
+}
+
+int sideOrWedge(Tile t) {
+  return sideOrWedge(t.x, t.y);
+}
+
+int sideOrWedge(int x1, int y1) {
   int numX = 0;
   int numY = 0;
   for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
@@ -308,6 +392,116 @@ int squareOrWedge(int x1, int y1) {
   } else {
     return WEDGE;
   }
+}
+
+boolean containsSide(int x, int y) {
+  return sideOrWedge(x, y) == SIDE;
+}
+
+boolean isSide(Tile t) {
+  return containsSide(t.x, t.y);
+}
+
+//the Tile should be a side
+PVector getDirectionOfSquareSide(Tile side) {
+  PVector temp = new PVector();
+
+  int x1 = side.x;
+  int y1 = side.y;
+
+  for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
+    int newX = x1 + x;
+    if (containsSquare(newX, y1)) {
+      temp.x = newX - x1;
+      temp.y = 0;
+      return temp;
+    }
+  }
+  for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
+    int newY = y1 + y;
+    if (containsSquare(x1, newY)) {
+      temp.x = 0;
+      temp.y = newY - y1;
+      return temp;
+    }
+  }
+  println("error, the code should not get here if the tile is a side");
+  return temp;
+}
+
+//get the direction of a square off the corner
+PVector getDirOfCornSquare(Tile t) {
+  if (t.type != CORN) {
+    println("tile is not a corner, error");
+  }
+
+  for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
+    for (int y = -SIZE; y <= SIZE; y += SIZE * 2) {
+      if(containsSquare(x + t.x, y + t.y)){
+       return new PVector(x, y); 
+      }
+    }
+  }
+  println("no square diaganol from corner");
+  return null;
+}
+
+void rotateCorner(Tile t, PVector dir) {
+  //println(dir.heading());
+  //float rot = dir.heading() + 7 * PI / 4;
+  //rot /= PI / 2;
+  //rot += 2;
+  //t.verts = t.rotation(t.verts, (int) rot);
+  float a = (dir.heading() + TWO_PI) % TWO_PI;
+  println(a);
+  println(PI / 4);
+  //PI / 4 has an extra decimal place for some reason
+  if (a == .785398) {
+    print("yeah");
+    t.verts = t.rotation(t.verts, 2);
+  }
+  if (a == 3 * PI / 4) {
+    t.verts = t.rotation(t.verts, 0);
+  }
+  if (a == (5 * PI) / 4) {
+    t.verts = t.rotation(t.verts, 6);
+  }
+  if (a == 7 * PI / 4) {
+    t.verts = t.rotation(t.verts, 4);
+  }
+}
+
+void removeTile(Tile t) {
+  tiles.remove(t);
+}
+
+void removeTile(int x, int y) {
+  for (int i = tiles.size() - 1; i >= 0; i--) {
+    Tile t = tiles.get(i);
+    if (t.x == x && t.y == y) {
+      tiles.remove(t);
+    }
+  }
+}
+
+boolean containsSquare(int x, int y) {
+  for (Tile t : tiles) {
+    if (t.isSquare()) {
+      if (t.x == x && t.y == y) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+boolean contains(int x, int y) {
+  for (Tile t : tiles) {
+    if (t.x == x && t.y == y) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void keyPressed() {

@@ -10,7 +10,7 @@
 //   player1.functions.move();
 
 //this variables get imoprted with the player class
-var SPEED = 400;
+var SPEED = 200;
 
 var LEFT = 0;
 var RIGHT = 1;
@@ -231,7 +231,9 @@ export default class Player{
     //stops the dashing
     this.player.lastKeys = {};
     this.addScore(1);
-    otherPlayer.wormCount -= 1;
+    if(otherPlayer.wormCount > 0){
+      otherPlayer.function.addWorms(-1);
+    }
 
     //something weird was going on with this line below
     otherPlayer.respawnCounter = 100;
@@ -265,10 +267,15 @@ export default class Player{
 
 //Gets big and fast
   berserk(){
-    this.player.wormCount -= 3;
+    this.addWorms(-3);
     this.player.setScale(2);
     this.player.speed = SPEED * 1.5;
     this.player.berserk = 180;
+  }
+
+  addWorms(num){
+    this.player.wormCount += num;
+    this.player.wormText.setText(`${this.player.wormCount}`);
   }
 
   poop(){
