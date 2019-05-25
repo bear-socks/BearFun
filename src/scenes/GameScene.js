@@ -18,6 +18,7 @@ var gameState = {};
 gameState.width = 1200;
 gameState.height = 800;
 
+
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
   constructor(){
@@ -139,6 +140,7 @@ export default class GameScene extends Phaser.Scene {
       if (gameState.player2.base.isOpen){
         gameState.player1.functions.addScore(3);
         gameState.player1.functions.respawn();
+        gameState.player2.functions.setBaseOpen(false);
       }
     })
 
@@ -165,6 +167,7 @@ export default class GameScene extends Phaser.Scene {
       if (gameState.player1.base.isOpen){
         gameState.player2.functions.addScore(3);
         gameState.player2.functions.respawn();
+        gameState.player1.functions.setBaseOpen(false);
       }
     })
   }

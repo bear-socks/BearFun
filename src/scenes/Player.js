@@ -126,18 +126,10 @@ export default class Player{
     var y = 0;
     for(var i = 0; i < keyArr.length; i++){
       var val = keyArr[i];
-      if(val == 2){
-        x -= 1;
-      }
-      if(val == 3){
-        x += 1;
-      }
-      if(val == 0){
-        y -= 1;
-      }
-      if(val == 1){
-        y += 1;
-      }
+      if(val == 0){y -= 1;}
+      if(val == 1){y += 1;}
+      if(val == 2){x -= 1;}
+      if(val == 3){x += 1;}
     }
     if(x != 0){
       this.player.setVelocityX(this.player.speed * multiplier * x);
