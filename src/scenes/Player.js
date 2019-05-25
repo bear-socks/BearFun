@@ -10,7 +10,7 @@
 //   player1.functions.move();
 
 //this variables get imoprted with the player class
-var SPEED = 200;
+var SPEED = 400;
 
 var LEFT = 0;
 var RIGHT = 1;
@@ -44,6 +44,7 @@ export default class Player{
     //must assign this though
     //player.body;
     player.scoreText;
+    player.textPos = [];
 
     //stuff we need could implement but might be hard
     player.lastKeys = {};
@@ -93,6 +94,7 @@ export default class Player{
         this.player.berserk = -1;
         this.player.setScale(1);
         this.player.speed = SPEED;
+        this.player.hasPriority = false;
       }
     }
     else if (this.player.respawnCounter == 0){
@@ -105,31 +107,43 @@ export default class Player{
   }
 
   movement(){
+    var keyArr = []
     if (! this.player.isDashing){
       for(var i = 0; i <= 3; i++){
         if (this.player.directKeys[i].isDown) {
-          this.move(i, 1);
+          keyArr[i] = i;
         }
       }
+      this.move(keyArr, 1);
     }
     this.specialMovement();
     this.animatePlayer();
   }
 
-  //I think this is where the dashing problem is
-  move(key, multiplier){
+  move(keyArr, multiplier){
     //this.add.text(600, 600, key);
-    if(key == 2){
-      this.player.setVelocityX(-this.player.speed * multiplier);
+    var x = 0;
+    var y = 0;
+    for(var i = 0; i < keyArr.length; i++){
+      var val = keyArr[i];
+      if(val == 2){
+        x -= 1;
+      }
+      if(val == 3){
+        x += 1;
+      }
+      if(val == 0){
+        y -= 1;
+      }
+      if(val == 1){
+        y += 1;
+      }
     }
-    if(key == 3){
-      this.player.setVelocityX(this.player.speed * multiplier);
+    if(x != 0){
+      this.player.setVelocityX(this.player.speed * multiplier * x);
     }
-    if(key == 0){
-      this.player.setVelocityY(-this.player.speed * multiplier);
-    }
-    if(key == 1){
-      this.player.setVelocityY(this.player.speed * multiplier);
+    if(y != 0){
+      this.player.setVelocityY(this.player.speed * multiplier * y);
     }
   }
 
@@ -168,7 +182,7 @@ export default class Player{
       //dashing
       else if(this.player.lastKeys[i] <= -1){
         //console.log(key);
-        this.move(i, 3);
+        this.move([i], 3);
         dashingVar = true;
         if(this.player.lastKeys[i] == -1){
           dashingVar = false;
@@ -251,6 +265,14 @@ export default class Player{
   addScore(num){
     this.player.score += num;
     this.player.scoreText.setText(`${this.player.score}`);
+    this.recenterText();
+    //gameState.player2.scoreText.setPosition(100 + (gameState.player2.scoreText.width / 2) , 100);
+  }
+
+  addWorms(num){
+    this.player.wormCount += num;
+    this.player.wormText.setText(`${this.player.wormCount}`);
+    this.recenterText();
   }
 
   setBaseOpen(b){
@@ -271,11 +293,21 @@ export default class Player{
     this.player.setScale(2);
     this.player.speed = SPEED * 1.5;
     this.player.berserk = 180;
+    this.player.hasPriority = true;
   }
 
-  addWorms(num){
-    this.player.wormCount += num;
-    this.player.wormText.setText(`${this.player.wormCount}`);
+  initText(x2, y2){
+    this.player.textPos.x = x2;
+    this.player.textPos.y = y2;
+    this.recenterText();
+     //score goes in front of players
+     this.player.scoreText.setDepth(1);
+     this.player.wormText.setDepth(1);
+  }
+
+  recenterText(){
+    this.player.scoreText.setPosition(this.player.textPos.x - (this.player.scoreText.width / 2) , this.player.textPos.y);
+    this.player.wormText.setPosition(this.player.textPos.x - (this.player.wormText.width / 2) , this.player.textPos.y + 50);
   }
 
   poop(){

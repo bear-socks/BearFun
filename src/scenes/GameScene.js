@@ -170,20 +170,19 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createPlayerText(){
+    //possibly point this two lines below into the initText? pass in the scene object as a parameter?
     gameState.player1.scoreText = this.add.text(1050, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
-
     gameState.player1.wormText = this.add.text(1050, 100, '0', { fontSize: '25px',
     fill: '#FFFFFF'});
-    //score goes in front of players
-    gameState.player1.scoreText.setDepth(1);
+    gameState.player1.functions.initText(1050, 50);
 
+    //player2
     gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
-    gameState.player2.scoreText.setDepth(1);
-
     gameState.player2.wormText = this.add.text(100, 100, '0', { fontSize: '25px',
     fill: '#FFFFFF'});
+    gameState.player2.functions.initText(100, 50);
   }
 
   genWorm(){
@@ -250,7 +249,7 @@ export default class GameScene extends Phaser.Scene {
         }
         if(!gameState.player1.hasPriority){
           gameState.player2.functions.kill(gameState.player1);
-        }d
+        }
       }
     }
     else{
