@@ -2,8 +2,8 @@
 export default {
   type: Phaser.AUTO,
   parent: "phaser-example",
-  width: 1200,
-  height: 800,
+  width: 1184,
+  height: 672,
   //https://labs.phaser.io/view.html?src=src\physics\arcade\body%20controls.js
   physics: {
 	    default: 'arcade',

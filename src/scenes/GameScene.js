@@ -1,22 +1,24 @@
 import 'phaser';
 
-//importing player class
+//importing classes
 import Player from "./Player.js"
 import Base from "./Base.js"
+import TreeTiling from "./TreeTiling.js"
 
 import cardinalRImg from './assets/cardinalRight.png';
 import blueJay from './assets/blueJay.png'
 import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
 import worm from './assets/worm.png';
+
 //loading sound is not working, not sure why
-//import skyMall from './assets/skyMall.mp3';
+//import tskyMall from './assets/skyMall.mp3';
 
 //this is used to avoid having to making global variables for everything
 //that we need to pass between the preload create and update functions
 var gameState = {};
-gameState.width = 1200;
-gameState.height = 800;
+gameState.width = 1184; //37 * 32
+gameState.height = 672; //21 * 32
 
 
 export default class GameScene extends Phaser.Scene {
@@ -27,20 +29,26 @@ export default class GameScene extends Phaser.Scene {
 
   preload(){
     //you can load images from the web like this
-    //this.load.image('cardinalR', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
+    //this.load.image('tcardinalR', 'https://s3.amazonaws.com/codecademy-content/courses/learn-phaser/sky.jpg');
 
     //why doesn't this work vvv
-    //this.load.image('cardinalR', './assets/logo.png');
+    //this.load.image('tcardinalR', './assets/logo.png');
     this.load.image('cardinalR', cardinalRImg);
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('worm', worm, {frameWidth: 6, frameHeight: 15});
-    //this.load.image('worm', worm);
+    //this.load.image('tworm', worm);
     //this.load.audio('theme', skyMall);
+
+
+    gameState.treeTiling = new TreeTiling(this, gameState.width, gameState.height);
   }
 
   create(){
+
+    //gameState.treeTiling = new TreeTiling(this);
+    gameState.treeTiling.display();
 
     gameState.keysText = this.add.text(300, 100, '');
     //this.add.text(50, 50, 'will like poop');
@@ -78,7 +86,6 @@ export default class GameScene extends Phaser.Scene {
     //add players to one group?
     gameState.player1 = this.physics.add.sprite(gameState.width * .75, gameState.height * .5, 'blueJay');
     gameState.player1 = new Player(gameState.player1, gameState.keysPlayer1);
-    gameState.player1.functions.poop();
     //gameState.player1.functions.poop();
     gameState.player1.animArr[0] = this.anims.create({
       key: 'movementLeft',
@@ -112,7 +119,7 @@ export default class GameScene extends Phaser.Scene {
     gameState.keysPlayer2 = this.input.keyboard.addKeys('W,S,A,D,Q');
     gameState.player2 = this.physics.add.sprite(gameState.width * .25, gameState.height * .5, 'cardinalR');
     gameState.player2 = new Player(gameState.player2, gameState.keysPlayer2);
-    gameState.player2.functions.poop();
+    //gameState.player2.functions.poop();
   }
 
   //creates the bases for both teams. Open when a player dies.

@@ -9,46 +9,38 @@ class Tile {
   //collection of 8 points to represent if each point is connected or not
   int[] verts;
   boolean nextDiag = false;
-  
-  //////////////////// NEW
   int type;
-  
+
   public Tile(int x_, int y_, int[] verts_) {
     x = x_;
     y = y_;
     verts = verts_;
   }
 
-  //public Tile(int x_, int y_, float sideNum) {
-  //  x = x_;
-  //  y = y_;
-  //  verts = genVerts(sideNum);
-  //}
-  
   public Tile(int x_, int y_, int type_) {
     x = x_;
     y = y_;
     type = type_;
-    //an empty placeholder for now
-    verts = genVerts(-1);
+    if (type == SQU) {
+      verts = genVerts(0);
+    } else {
+      //an empty placeholder for now
+      verts = genVerts(-1);
+    }
   }
 
-  void setColor(){
-   if(type == CORN){
-    fill(155, 100, 55); 
-   }
-   else if(type == SIDE){
-    fill(255, 0, 0);
-   }
-   else if(type == WEDGE){
-    fill(0, 255, 0); 
-   }
-   else if(type == SQU){
-    fill(0, 0, 255); 
-   }
-   else{
-    fill(0); 
-   }
+  void setColor() {
+    if (type == CORN) {
+      fill(155, 100, 55);
+    } else if (type == SIDE) {
+      fill(255, 0, 0);
+    } else if (type == WEDGE) {
+      fill(0, 255, 0);
+    } else if (type == SQU) {
+      fill(0, 0, 255);
+    } else {
+      fill(0);
+    }
   }
 
   void display() {
@@ -65,8 +57,7 @@ class Tile {
     pushMatrix();
     translate(x, y);
     ellipse(SIZE / 2, SIZE / 2, 10, 10);
-    //println(getCode());
-    //image(imgs.get(getCode()), 0, 0);   
+    //println(getCode()); 
     beginShape();
     //verts starts at top left and goes ccw
     for (int i = 0; i < 8; i++) {
@@ -75,6 +66,7 @@ class Tile {
       }
     }
     endShape(CLOSE);
+    //image(imgs.get(getCode()), 0, 0);  
     popMatrix();
   }
 
@@ -175,27 +167,25 @@ class Tile {
     return nVert;
   }
 
-  int[] randomRotation(int[] verts) {
-    //rotate(((int) random(4)) * PI / 2);
-    return verts;
-  }
-
   boolean isSquare() {
-    //for (int n : verts) {
-    //  //print(n);
-    //  if (n == 0) {
-    //    return false;
-    //  }
-    //}
-    //return true;
     return type == SQU;
   }
 
+  boolean hasSquare() {
+    for (int n : verts) {
+      //print(n);
+      if (n == 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   //0 = left, 1 = right, 2 = top, 3 = bottom
-  void matchTile(Tile[] tileArr) {
+  void matchTile(Tile[] tileArr, boolean canWedge) {
     for (int i = 0; i < 4; i++) {
       Tile adjT = tileArr[i];
-      if (adjT != null) {
+      if (adjT != null && (canWedge || adjT.type != WEDGE)) {
         //not sure about i == 0
         if (i == 0) {
           //matching up this particular side
@@ -223,8 +213,7 @@ class Tile {
           }
         }
         //println(i);
-      }
-      //println(tileArr[i]);
+      } 
     }
   }
 
@@ -232,7 +221,7 @@ class Tile {
   void matchNulls(Tile[] tileArr) {
     for (int i = 0; i < 4; i++) {
       Tile adjT = tileArr[i];
-      if (adjT == null) {
+      if (adjT == null || adjT.type == WEDGE) {
         //not sure about i == 0
         if (i == 0) {
           //matching up this particular side
@@ -283,15 +272,16 @@ class Tile {
         //  println("ERROR FIXSQUARE");
         //}
         removeSideIndex(i);
+        return;
       }
     }
-    removeIsolatedVertices();
+    //removeIsolatedVertices();
   } 
 
   void removeSideIndex(int index) {
     //converting to the vertex coordinate 
     if (index != -1) {
-      println(index);
+      //println(index);
       if (index == 0) {
         index = 1;
       } else if (index == 1) {
@@ -300,8 +290,8 @@ class Tile {
         index = 7;
       }
       //index = 3 both times
-      println(index);
-      println();
+      //println(index);
+      //println();
       verts[index] = 0;
     }
   }
@@ -319,18 +309,4 @@ class Tile {
     return str;
   }
 
-  //int convertBinary(){
-  //  int sum = 0;
-  //  for(int i = 0; i < verts.length; i++){
-  //    if(i == 0){
-  //      //1 or 0
-  //      sum += verts[0];
-  //    }
-  //    else{
-  //      sum += pow(verts[i] * 2, i);
-  //    }
-  //    print(verts[i]);
-  //  }
-  //  return sum;
-  //}
 }

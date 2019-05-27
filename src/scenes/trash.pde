@@ -11,10 +11,10 @@ void setup() {
   tiles = new ArrayList<Tile>();
 
   loadImages();
-  
+
   genSquares();
   generate();
-  
+
 }
 
 void generate(){
@@ -31,36 +31,9 @@ void generate(){
   squareEdgesFix();
 }
 
-void loadImages() {
-  //8
-  addImg("11111111");
-  //3's special case
-  addImg("00000111");
-  addImg("00011100");
-  addImg("01110000");
-  addImg("11000001");
-
-  //go through every position with four to 8 ones
-  for (int numOnes = 4; numOnes <= 7; numOnes++) {
-    String str = "";
-    for (int i = 0; i < numOnes; i++) {
-      str += "1";
-    }
-    for (int i = numOnes; i < 8; i++) {
-      str += "0";
-    }
-    //rotate through all possibilities
-    for (int i = 0; i < 8; i++) {
-      addImg(str);
-      str = rotateForward(str);
-    }
-  }
-}
 
 void addImg(String str) {
   imgs.put(str, loadImage(str + ".png"));
-  //println("import " + str + " from './assets/TreeTiling/" + str + "';");
-  //println("this.load.image('" + str + "', " + str + ");");
 }
 
 void draw() {
@@ -94,7 +67,7 @@ void removeTiles() {
     Tile t = tiles.get(i);
     //println(imgs.get(t.getCode()));
     if (!isValidTile(t)) {
-      println(t.getCode()); 
+      println(t.getCode());
       tiles.remove(t);
     }
   }
@@ -258,7 +231,6 @@ void deleteSides() {
 }
 
 //4
-//something is messed up here
 void findCorners() {
   for (int i = tiles.size() - 1; i >= 0; i--) {
     Tile s1 = tiles.get(i);
@@ -301,8 +273,8 @@ void genCorners() {
         t.verts = t.genVerts(-1);
       } else {
         //1 or 2
-        int left = (int) random(1, 3); 
-        int bot = (int) random(1, 3); 
+        int left = (int) random(2, 3);
+        int bot = (int) random(2, 3);
         //left side
         for (int i = 2; i >= 2 - left; i--) {
           t.verts[i] = 1;
@@ -485,7 +457,7 @@ PVector getDirSquareOffSide(Tile side) {
 //get the direction of a square off the corner
 PVector getDirOfCornSquare(Tile t) {
   if (t.type != CORN) {
-    //println("tile is not a corner, error");
+    println("tile is not a corner, error");
   }
 
   for (int x = -SIZE; x <= SIZE; x += SIZE * 2) {
@@ -590,7 +562,7 @@ void keyPressed() {
     matchWedges();
     //wedgeFix();
     matchCorners();
-  } else if (key == '3') {  
+  } else if (key == '3') {
     fixUp();
     removeTiles();
   } else if (key == '4') {
