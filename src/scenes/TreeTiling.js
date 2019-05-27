@@ -261,16 +261,21 @@ export default class TreeTiling{
   var midHeight = Math.floor(this.tileHeight / 2);
 
   console.log(this.tileWidth)
+  //horizontal
   for (var i = 6; i < this.tileWidth - 6; i++) {
-    for (var j = midHeight; j < midHeight + 1; j += 1) {
-      this.tiles.push(new Tile(i * SIZE, SIZE * j, SQU, this.mainScene));
+    for (var j = midHeight - 7; j < midHeight + 8; j += 7) {
+      for(var h = 0; h < 2; h++){
+        this.tiles.push(new Tile(i * SIZE, SIZE * (j + h), SQU, this.mainScene));
+      }
     }
   }
 
-  for (var i = midWidth; i < midWidth + 1; i++) {
+  //vertical
+  for (var i = midWidth -10; i < midWidth + 11; i += 10) {
     for (var j = 3; j < this.tileHeight - 3; j ++) {
-      if(j != midHeight){
-        this.tiles.push(new Tile(i * SIZE, SIZE * j, SQU, this.mainScene));
+      for(var w = -1; w < 1; w++){
+        if(j != midHeight)
+        this.tiles.push(new Tile((i + w) * SIZE, SIZE * (j), SQU, this.mainScene));
       }
     }
   }
