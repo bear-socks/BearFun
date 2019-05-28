@@ -119,6 +119,10 @@ export default class TreeTiling{
     //remove tiles broken right now
     this.removeTiles();
     this.squareEdgesFix();
+
+     // this.matchSides();
+     // this.matchWedges();
+     // this.matchCorners();
   }
 
   display(){
@@ -260,24 +264,36 @@ export default class TreeTiling{
   var midWidth = Math.floor(this.tileWidth / 2);
   var midHeight = Math.floor(this.tileHeight / 2);
 
-  console.log(this.tileWidth)
+  //console.log(this.tileWidth)
+
+  var hDist = 8;
   //horizontal
-  for (var i = 6; i < this.tileWidth - 6; i++) {
-    for (var j = midHeight - 7; j < midHeight + 8; j += 7) {
+  for (var i = 5; i < this.tileWidth - 5; i++) {
+    for (var j = midHeight - hDist; j <= midHeight + hDist; j += hDist) {
       for(var h = 0; h < 2; h++){
-        this.tiles.push(new Tile(i * SIZE, SIZE * (j + h), SQU, this.mainScene));
+          this.addTile(i, j + h);
       }
     }
   }
 
+  var vDist = 12;
   //vertical
-  for (var i = midWidth -10; i < midWidth + 11; i += 10) {
+  for (var i = midWidth -vDist; i <= midWidth + vDist; i += vDist) {
     for (var j = 3; j < this.tileHeight - 3; j ++) {
-      for(var w = -1; w < 1; w++){
+      for(var w = -1; w <= 1; w++){
         if(j != midHeight)
-        this.tiles.push(new Tile((i + w) * SIZE, SIZE * (j), SQU, this.mainScene));
+        this.addTile(i + w, j);
       }
     }
+  }
+}
+
+addTile(i, j){
+  if(! this.contains(i * SIZE, j * SIZE)){
+    this.tiles.push(new Tile(SIZE * i, SIZE * j, SQU, this.mainScene));
+  }
+  else{
+    console.log("denied")
   }
 }
 
@@ -686,7 +702,7 @@ export default class TreeTiling{
       if (t.type == SIDE || t.type == WEDGE) {
         for (var j = 0; j < t.verts.length; j++) {
           var num = t.verts[j];
-          if (num == 0 && t.verts[(j + 7) % 8] == 1 && t.verts[(j + 1) % 8] == 1) {
+          if (num == 0 && t.verts[(j + 7) % 8] == 1 && t.verts[(j + 1) % 8] == 1 && j % 2 == 1) {
             t.verts[j] = 1;
           }
         }

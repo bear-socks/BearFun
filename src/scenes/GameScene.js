@@ -19,7 +19,8 @@ import worm from './assets/worm.png';
 var gameState = {};
 gameState.width = 1184; //37 * 32
 gameState.height = 672; //21 * 32
-
+//should be bound to the value in treetiling but isn't
+gameState.size = 32;
 
 export default class GameScene extends Phaser.Scene {
   //calling the super constructor
@@ -181,18 +182,18 @@ export default class GameScene extends Phaser.Scene {
 
   createPlayerText(){
     //possibly point this two lines below into the initText? pass in the scene object as a parameter?
-    gameState.player1.scoreText = this.add.text(1050, 50, '0', { fontSize: '45px',
+    gameState.player1.scoreText = this.add.text(0, 0, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
-    gameState.player1.wormText = this.add.text(1050, 100, '0', { fontSize: '25px',
+    gameState.player1.wormText = this.add.text(0, 0, '0', { fontSize: '25px',
     fill: '#FFFFFF'});
-    gameState.player1.functions.initText(1050, 50);
+    gameState.player1.functions.initText(gameState.width - gameState.size * 3, 50);
 
     //player2
-    gameState.player2.scoreText = this.add.text(100, 50, '0', { fontSize: '45px',
+    gameState.player2.scoreText = this.add.text(0, 0, '0', { fontSize: '45px',
     fill: '#FFFFFF'});
-    gameState.player2.wormText = this.add.text(100, 100, '0', { fontSize: '25px',
+    gameState.player2.wormText = this.add.text(0, 0, '0', { fontSize: '25px',
     fill: '#FFFFFF'});
-    gameState.player2.functions.initText(100, 50);
+    gameState.player2.functions.initText(gameState.size * 3, 50);
   }
 
   genWorm(){

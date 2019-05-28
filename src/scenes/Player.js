@@ -293,7 +293,7 @@ export default class Player{
     this.player.textPos.y = y2;
     this.recenterText();
      //score goes in front of players
-     this.player.scoreText.setDepth(1);
+     this.player.scoreText.setDepth(3);
      this.player.wormText.setDepth(1);
   }
 

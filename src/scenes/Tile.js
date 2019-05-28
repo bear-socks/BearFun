@@ -209,7 +209,7 @@ export default class Tile{
   display(SCALE){
     var str = this.getCode();
     //console.log(str);
-    this.mainScene.add.image(this.x, this.y, str).setDepth(2).setScale(SCALE);
+    this.mainScene.add.image(this.x + 16, this.y + 16, str).setDepth(2).setScale(SCALE);
   }
 
   //returns a randomInt between the two numbers
