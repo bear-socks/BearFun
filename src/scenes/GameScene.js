@@ -237,10 +237,10 @@ export default class GameScene extends Phaser.Scene {
 
   getWinner(){
     if(gameState.levelNum < 0){
-      return "Cardinal";
+      return "Blue Jay";
     }
     else{
-      return "Blue Jay";
+      return "Cardinal";
     }
   }
 

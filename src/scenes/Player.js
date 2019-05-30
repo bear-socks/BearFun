@@ -10,7 +10,7 @@
 //   player1.functions.move();
 
 //this variables get imoprted with the player class
-var SPEED = 400;
+var SPEED = 200;
 
 var LEFT = 0;
 var RIGHT = 1;
@@ -274,9 +274,10 @@ export default class Player{
 //Power ups from the worms
 //Currently only berserk mode
   wormAction(){
-    if (this.player.wormCount >= 3){
+    console.log(this.player.berserk);
+    if (this.player.wormCount >= 3 && this.player.berserk == -1){
         this.berserk();
-      }
+    }
   }
 
 //Gets big and fast
