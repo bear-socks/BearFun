@@ -42,14 +42,29 @@ export default class GameScene extends Phaser.Scene {
     //this.load.image('tworm', worm);
     //this.load.audio('theme', skyMall);
 
+    gameState.levels = [];
+    gameState.levelNum = 0;
+    for(var i = -2; i <= 2; i++){
+      gameState.levels[i] = new TreeTiling(this, gameState.width, gameState.height);
 
-    gameState.treeTiling = new TreeTiling(this, gameState.width, gameState.height);
+      gameState.graphics = this.add.graphics({x: 0, y: 0});
+      //var circle = Phaser.Geom.Circle(gameState.width, 32, 16);
+      //graphics.fillCircle(500, 500, 500);
+      gameState.graphics.fillStyle(0xAAAAAA, 1.0);
+
+      gameState.graphics.fillCircle((gameState.width / 2) + i * 64, 50, 14).setDepth(5);
+    //graphics.fillRect(50, 50, 400, 200);
+    }
   }
 
   create(){
 
     //gameState.treeTiling = new TreeTiling(this);
-    gameState.treeTiling.display();
+    gameState.levels[gameState.levelNum].display();
+
+    var markerG = this.add.graphics({x: 0, y: 0});
+    markerG.lineStyle(3, 0x00FF00, 1.0);
+    gameState.marker = markerG.strokeCircle((gameState.width / 2) + gameState.levelNum * 64, 50, 20).setDepth(5);
 
     gameState.keysText = this.add.text(300, 100, '');
     //this.add.text(50, 50, 'will like poop');
@@ -146,9 +161,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(gameState.player1, gameState.player2.base.sprite, () => {
       if (gameState.player2.base.isOpen){
-        gameState.player1.functions.addScore(3);
-        gameState.player1.functions.respawn();
-        gameState.player2.functions.setBaseOpen(false);
+        this.enterBase(gameState.player1, gameState.player2);
       }
     })
 
@@ -173,11 +186,62 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(gameState.player2,  gameState.player1.base.sprite, () => {
       if (gameState.player1.base.isOpen){
-        gameState.player2.functions.addScore(3);
-        gameState.player2.functions.respawn();
-        gameState.player1.functions.setBaseOpen(false);
+        this.enterBase(gameState.player2, gameState.player1);
       }
     })
+  }
+
+  //play1 entered play2's base
+  enterBase(play1, play2){
+    play1.functions.addScore(3);
+    play1.functions.respawn();
+    play2.functions.setBaseOpen(false);
+    if(play1 == gameState.player1){
+      this.loadLevel(-1)
+    }
+    else{
+      this.loadLevel(1)
+    }
+  }
+
+  loadLevel(inc){
+    gameState.levels[gameState.levelNum].stopDisplay();
+    gameState.levelNum += inc;
+    var level = gameState.levels[gameState.levelNum];
+
+    try {
+      gameState.levels[gameState.levelNum].display();
+    }
+    catch(err){
+      this.gameOver();
+    }
+    this.updateMarker();
+  }
+
+  updateMarker(){
+    //actually moves it this much instead of position the graphics
+    //because this is moving the whole graphics object, not just the marker
+    gameState.marker.setPosition(gameState.levelNum * 64, 0);
+  }
+
+  gameOver(){
+    var txt = this.add.text(0, 0, this.getWinner() +
+     " absolutely destroyed \n and won the game \n and saved the world!",
+     { fontSize: '45px', fill: '#FFFFFF'})
+     .setDepth(3);
+
+     txt.setPosition((gameState.width / 2) - txt.width / 2, (gameState.height / 2) - txt.height / 2);
+
+     this.physics.pause();
+  }
+
+  getWinner(){
+    if(gameState.levelNum < 0){
+      return "Cardinal";
+    }
+    else{
+      return "Blue Jay";
+    }
   }
 
   createPlayerText(){

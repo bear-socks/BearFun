@@ -559,10 +559,10 @@ boolean contains(int x, int y) {
 
 void fixUp() {
   for (Tile t : tiles) {
-    if (t.type == SIDE /**|| t.type == WEDGE**/) {
+    if (t.type == SIDE || t.type == WEDGE) {
       for (int i = 0; i < t.verts.length; i++) {
         int num = t.verts[i];
-        if (num == 0 && t.verts[(i + 7) % 8] == 1 && t.verts[(i + 1) % 8] == 1) {
+        if (num == 0 && t.verts[(i + 7) % 8] == 1 && t.verts[(i + 1) % 8] == 1 && i % 2 == 1) {
           t.verts[i] = 1;
         }
       }

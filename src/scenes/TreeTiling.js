@@ -133,6 +133,14 @@ export default class TreeTiling{
     //this.mainScene.add.image(50, 50, 't11111111');
   }
 
+  stopDisplay(){
+
+    for(var i = 0; i < this.tiles.length; i++){
+      this.tiles[i].stopDisplay();
+    }
+    //this.mainScene.add.image(50, 50, 't11111111');
+  }
+
   //THIS MIGHT NOT WORK ANYMORE BECAUSE IT CAN DISPLAY AN INVALID PICTURE
   isValidTile(t) {
 
