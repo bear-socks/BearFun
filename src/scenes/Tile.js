@@ -5,14 +5,14 @@ var SQU = 3;
 
 export default class Tile{
   constructor(x, y, type, mainScene){
-    this.x = x;
-    this.y = y;
+    this.x = Math.floor(x);
+    this.y = Math.floor(y);
     //collection of 8 points to represent if each point is connected or not
     this.verts = [0,0,0,0,0,0,0,0];
     this.mainScene = mainScene;
     this.nextDiag = false;
     this.type = type;
-    console.log(this.type);
+    //console.log(this.type);
     if (this.type == SQU) {
       this.genVertsInit(0);
     } else {

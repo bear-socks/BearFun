@@ -125,6 +125,67 @@ export default class TreeTiling{
      // this.matchCorners();
   }
 
+  //1
+  //can you += a js array?
+  //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
+    genSquares() {
+    //0 = a full square
+
+    var midWidth = Math.floor(this.tileWidth / 2);
+    var midHeight = Math.floor(this.tileHeight / 2);
+
+    //console.log(this.tileWidth)
+
+    var r = this.random(0, 2);
+
+    if(r == 0){
+      //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
+      this.genGridSquares(midWidth, midHeight);
+    }
+    else if(r == 1){
+      this.genDiagSquares(midWidth, midHeight);
+    }
+
+
+  }
+  //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
+  genGridSquares(midWidth, midHeight){
+    var hDist = 8;
+    //horizontal
+    for (var i = 5; i < this.tileWidth - 5; i++) {
+      for (var j = midHeight - hDist; j <= midHeight + hDist; j += hDist) {
+        for(var h = 0; h < 2; h++){
+            this.addTile(i, j + h);
+        }
+      }
+    }
+
+    var vDist = 12;
+    //vertical
+    for (var i = midWidth -vDist; i <= midWidth + vDist; i += vDist) {
+      for (var j = 3; j < this.tileHeight - 3; j ++) {
+        for(var w = -1; w <= 1; w++){
+          if(j != midHeight)
+          this.addTile(i + w, j);
+        }
+      }
+    }
+  }
+
+  genDiagSquares(midWidth, midHeight){
+    var j = 0;
+    for (var i = 5; i < this.tileWidth - 5; i++) {
+      j = (((this.tileHeight - 7) / (this.tileWidth - 11)) * i) + 2;
+      this.addTile(i, j);
+      this.addTile(i, j+1);
+      this.addTile(i, j-1);
+      this.addTile(this.tileWidth - i, j);
+      this.addTile(this.tileWidth - i, j + 1);
+      this.addTile(this.tileWidth - i, j - 1);
+    }
+
+  }
+
   display(){
 
     for(var i = 0; i < this.tiles.length; i++){
@@ -264,44 +325,15 @@ export default class TreeTiling{
 
 //////////////////////MAIN GENERATE functions
 
-//1
-//can you += a js array?
-  genSquares() {
-  //0 = a full square
-
-  var midWidth = Math.floor(this.tileWidth / 2);
-  var midHeight = Math.floor(this.tileHeight / 2);
-
-  //console.log(this.tileWidth)
-
-  var hDist = 8;
-  //horizontal
-  for (var i = 5; i < this.tileWidth - 5; i++) {
-    for (var j = midHeight - hDist; j <= midHeight + hDist; j += hDist) {
-      for(var h = 0; h < 2; h++){
-          this.addTile(i, j + h);
-      }
-    }
-  }
-
-  var vDist = 12;
-  //vertical
-  for (var i = midWidth -vDist; i <= midWidth + vDist; i += vDist) {
-    for (var j = 3; j < this.tileHeight - 3; j ++) {
-      for(var w = -1; w <= 1; w++){
-        if(j != midHeight)
-        this.addTile(i + w, j);
-      }
-    }
-  }
-}
 
 addTile(i, j){
+  i = Math.floor(i);
+  j = Math.floor(j);
   if(! this.contains(i * SIZE, j * SIZE)){
     this.tiles.push(new Tile(SIZE * i, SIZE * j, SQU, this.mainScene));
   }
   else{
-    console.log("denied")
+    //console.log("denied")
   }
 }
 
@@ -523,6 +555,8 @@ addTile(i, j){
   }
 
   genTilePlace(x, y) {
+    x = Math.floor(x);
+    y = Math.floor(y);
     var type = this.sideOrWedgePos(x, y);
     if (type != -1) {
       if (! this.contains(x, y)) {
@@ -665,7 +699,6 @@ addTile(i, j){
   }
 
   removeTile(t) {
-
     for (var i = this.tiles.length - 1; i >= 0; i--){
      if (this.tiles[i] === t) {
        this.tiles.splice(i, 1);
@@ -674,15 +707,20 @@ addTile(i, j){
   }
 
   removeTilePos(x, y) {
-    for (var i = this.tiles.size() - 1; i >= 0; i--) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    for (var i = this.tiles.length - 1; i >= 0; i--) {
       var t = this.tiles[i];
       if (t.x == x && t.y == y) {
         this.tiles.splice(i, 1);
       }
     }
+    console.log("used removeTilePos, maybe error?")
   }
 
   containsSquare(x, y) {
+    x = Math.floor(x);
+    y = Math.floor(y);
     for (var i = 0; i < this.tiles.length; i++) {
       var t = this.tiles[i];
       if (t.isSquare()) {
@@ -695,6 +733,8 @@ addTile(i, j){
   }
 
   contains(x, y) {
+    x = Math.floor(x);
+    y = Math.floor(y);
     for (var i = 0; i < this.tiles.length; i++) {
       var t = this.tiles[i];
       if (t.x == x && t.y == y) {
@@ -718,6 +758,7 @@ addTile(i, j){
     }
   }
 
+  //retrurns a random int without the higher number
   random(num1, num2){
     num2 -= num1;
     return Math.floor((Math.random() * num2) + num1);

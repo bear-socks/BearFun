@@ -10,7 +10,8 @@
 //   player1.functions.move();
 
 //this variables get imoprted with the player class
-var SPEED = 200;
+//should be 200 when not testing
+var SPEED = 500;
 
 var LEFT = 0;
 var RIGHT = 1;
