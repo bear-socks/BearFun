@@ -120,15 +120,15 @@ export default class TreeTiling{
     this.removeTiles();
     this.squareEdgesFix();
 
-     // this.matchSides();
-     // this.matchWedges();
-     // this.matchCorners();
+    // this.matchSides();
+    // this.matchWedges();
+    // this.matchCorners();
   }
 
   //1
   //can you += a js array?
   //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
-    genSquares() {
+  genSquares() {
     //0 = a full square
 
     var midWidth = Math.floor(this.tileWidth / 2);
@@ -136,7 +136,7 @@ export default class TreeTiling{
 
     //console.log(this.tileWidth)
 
-    var r = this.random(0, 2);
+    var r = this.random(0, 3);
 
     if(r == 0){
       //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
@@ -144,6 +144,9 @@ export default class TreeTiling{
     }
     else if(r == 1){
       this.genDiagSquares(midWidth, midHeight);
+    }
+    else if(r == 2){
+      this.genRandom(midWidth, midHeight);
     }
 
 
@@ -155,18 +158,19 @@ export default class TreeTiling{
     for (var i = 5; i < this.tileWidth - 5; i++) {
       for (var j = midHeight - hDist; j <= midHeight + hDist; j += hDist) {
         for(var h = 0; h < 2; h++){
-            this.addTile(i, j + h);
+          this.addTile(i, j + h);
         }
       }
     }
 
     var vDist = 12;
     //vertical
-    for (var i = midWidth -vDist; i <= midWidth + vDist; i += vDist) {
+    for (var i = midWidth - vDist; i <= midWidth + vDist; i += vDist) {
       for (var j = 3; j < this.tileHeight - 3; j ++) {
         for(var w = -1; w <= 1; w++){
-          if(j != midHeight)
-          this.addTile(i + w, j);
+          if(j != midHeight){
+            this.addTile(i + w, j);
+          }
         }
       }
     }
@@ -183,8 +187,26 @@ export default class TreeTiling{
       this.addTile(this.tileWidth - i, j + 1);
       this.addTile(this.tileWidth - i, j - 1);
     }
-
   }
+
+  //Makes a randomly generated map
+  genRandom(midWidth, midHeight){
+    var k = 0;
+    for (var x = 4; x <= this.tileWidth - 5; x += 3){
+      for (var y = 0; y <= this.tileWidth; y += 3){
+        //change values of k to change density of trees
+        k = this.random(0, 10);
+        if (k <= 2)
+          //trees span as 3x3 boxes
+          for (var posX = x - 1; posX <= x + 1; posX++){
+            for (var posY = y - 1; posY <= y + 1; posY++){
+              this.addTile(posX, posY);
+            }
+          }
+        }
+      }
+    }
+
 
   display(){
 
@@ -283,9 +305,9 @@ export default class TreeTiling{
   }
 
   //MAD UNNECCESSARY REPEATED CODE
-//REWRITE WITH getAdjTilesAll
-//returns adjacent tiles (non-square)
-//0 = left, 1 = right, 2 = top, 3 = bottom
+  //REWRITE WITH getAdjTilesAll
+  //returns adjacent tiles (non-square)
+  //0 = left, 1 = right, 2 = top, 3 = bottom
   getAdjTiles(t) {
     var adjTiles = [null, null, null, null];
 
@@ -310,7 +332,7 @@ export default class TreeTiling{
     return adjTiles;
   }
 
-//does null work?
+  //does null work?
   getAdjTilesWedge(t) {
 
     var temp = this.getAdjTilesAll(t);
@@ -323,22 +345,22 @@ export default class TreeTiling{
     return temp;
   }
 
-//////////////////////MAIN GENERATE functions
+  //////////////////////MAIN GENERATE functions
 
 
-addTile(i, j){
-  i = Math.floor(i);
-  j = Math.floor(j);
-  if(! this.contains(i * SIZE, j * SIZE)){
-    this.tiles.push(new Tile(SIZE * i, SIZE * j, SQU, this.mainScene));
+  addTile(i, j){
+    i = Math.floor(i);
+    j = Math.floor(j);
+    if(! this.contains(i * SIZE, j * SIZE)){
+      this.tiles.push(new Tile(SIZE * i, SIZE * j, SQU, this.mainScene));
+    }
+    else{
+      //console.log("denied")
+    }
   }
-  else{
-    //console.log("denied")
-  }
-}
 
-//2
-//find sides and wedges of the trees
+  //2
+  //find sides and wedges of the trees
   findSidesWedges() {
     for (var i = this.tiles.length - 1; i >= 0; i--) {
       var t = this.tiles[i];
@@ -434,25 +456,25 @@ addTile(i, j){
   //5
   //problems here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   genCorners() {
-     for (var i = 0; i < this.tiles.length; i++) {
-       var t = this.tiles[i];
-       if (t.type == CORN) {
-    //     //var dir = this.getDirOfCornSquare(t);
-         var r = Math.random();
-         //should we let corners be empty?
-         if (r < 0) {
-           //empty tile
-           t.genVertsInit(-1);
-         } else {
+    for (var i = 0; i < this.tiles.length; i++) {
+      var t = this.tiles[i];
+      if (t.type == CORN) {
+        //     //var dir = this.getDirOfCornSquare(t);
+        var r = Math.random();
+        //should we let corners be empty?
+        if (r < 0) {
+          //empty tile
+          t.genVertsInit(-1);
+        } else {
           //1 or 2
           //if you want to work every time
           // var left = this.random(2, 3);
           // var bot = this.random(2, 3);
-           var left = this.random(1, 3);
-           var bot = this.random(1, 3);
-           //var left = 2;
-           //var bot = 2;
-           //left side
+          var left = this.random(1, 3);
+          var bot = this.random(1, 3);
+          //var left = 2;
+          //var bot = 2;
+          //left side
           for (var j = 2; j >= 2 - left; j -= 1) {
             t.verts[j] = 1;
           }
@@ -464,9 +486,9 @@ addTile(i, j){
 
           var dir = this.getDirOfCornSquare(t);
           this.rotateCorner(t, dir);
-         }
-       }
-     }
+        }
+      }
+    }
   }
 
   //6
@@ -517,7 +539,7 @@ addTile(i, j){
   //match corners to only wedges
   matchCorners() {
     for (var i = 0; i < this.tiles.length; i++) {
-    var t = this.tiles[i];
+      var t = this.tiles[i];
       if (t.type == CORN || t.type == SIDE) {
         var tileArr = this.getAdjTilesWedge(t);
         t.matchTile(tileArr, true);
@@ -525,7 +547,7 @@ addTile(i, j){
     }
   }
 
-//NEW helpers
+  //NEW helpers
 
   updateWedges() {
     for (var i = 0; i < this.tiles.length; i++) {
@@ -700,9 +722,9 @@ addTile(i, j){
 
   removeTile(t) {
     for (var i = this.tiles.length - 1; i >= 0; i--){
-     if (this.tiles[i] === t) {
-       this.tiles.splice(i, 1);
-     }
+      if (this.tiles[i] === t) {
+        this.tiles.splice(i, 1);
+      }
     }
   }
 
