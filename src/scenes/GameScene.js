@@ -10,6 +10,7 @@ import blueJay from './assets/blueJay.png'
 import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
 import worm from './assets/worm.png';
+import turret from './assets/turret.png'
 
 //loading sound is not working, not sure why
 //import tskyMall from './assets/skyMall.mp3';
@@ -35,6 +36,7 @@ export default class GameScene extends Phaser.Scene {
     //why doesn't this work vvv
     //this.load.image('tcardinalR', './assets/logo.png');
     this.load.image('cardinalR', cardinalRImg);
+    this.load.image('turret', turret)
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
@@ -275,7 +277,7 @@ export default class GameScene extends Phaser.Scene {
 
     //loop for calling worms, change delay to change span pace
     gameState.wormGenLoop = this.time.addEvent({
-      delay: 8000,
+      delay: 1000,
       callback: genWorm,
       callbackScope: this,
       loop: true
@@ -345,6 +347,16 @@ export default class GameScene extends Phaser.Scene {
     //}
   }
 
+  turret(player){
+    player.newTurret = false;
+    var turret = this.physics.add.sprite(player.x, player.y, 'turret');
+    /*if (player == gameState.player1) { turret.tint = '#504cf8'; }
+    else { turret.tint = '#88230E'}
+    */
+
+  }
+
+
   //do everything necessary to restart the game
   restartGame(){
     this.scene.restart();
@@ -352,6 +364,13 @@ export default class GameScene extends Phaser.Scene {
 
   update(){
     gameState.player1.functions.updatePlayer();
+    if (gameState.player1.newTurret){
+      this.turret(gameState.player1);
+    }
     gameState.player2.functions.updatePlayer();
+    if (gameState.player2.newTurret){
+      this.turret(gameState.player2);
+    }
   }
+
 }

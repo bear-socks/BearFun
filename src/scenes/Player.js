@@ -11,7 +11,7 @@
 
 //this variables get imoprted with the player class
 //should be 200 when not testing
-var SPEED = 500;
+var SPEED = 400;
 
 var LEFT = 0;
 var RIGHT = 1;
@@ -34,6 +34,8 @@ export default class Player{
     //worm stuff
     player.wormCount = 0;
     player.berserk = -1;
+    player.turret = false;
+    player.newTurret = false;
 
     //these are for animation
     player.directionX = 0;
@@ -275,9 +277,13 @@ export default class Player{
 //Power ups from the worms
 //Currently only berserk mode
   wormAction(){
+
     console.log(this.player.berserk);
-    if (this.player.wormCount >= 3 && this.player.berserk == -1){
-        this.berserk();
+    if (this.player.wormCount >= 5 && !(this.player.turret)){
+      this.turret();
+    }
+    else if (this.player.wormCount >= 3 && this.player.berserk == -1){
+      this.berserk();
     }
   }
 
@@ -289,6 +295,13 @@ export default class Player{
     this.player.berserk = 180;
     this.player.hasPriority = true;
   }
+
+  turret(){
+  this.addWorms(-5);
+  this.player.turret = true;
+  this.player.newTurret = true;
+  }
+
 
   initText(x2, y2){
     this.player.textPos.x = x2;

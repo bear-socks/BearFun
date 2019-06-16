@@ -136,8 +136,8 @@ export default class TreeTiling{
 
     //console.log(this.tileWidth)
 
-    var r = this.random(0, 3);
-
+    //var r = this.random(0, 3);
+    var r = 2;
     if(r == 0){
       //MAKE A NEW ONE OF THESE IF YOU WANT TO ADD A LEVEL
       this.genGridSquares(midWidth, midHeight);
