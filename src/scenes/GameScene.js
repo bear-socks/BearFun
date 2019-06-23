@@ -12,6 +12,7 @@ import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
 import worm from './assets/worm.png';
 import turret from './assets/turret.png'
+import nothing from './assets/nothing.png'
 
 //loading sound is not working, not sure why
 //import tskyMall from './assets/skyMall.mp3';
@@ -37,7 +38,8 @@ export default class GameScene extends Phaser.Scene {
     //why doesn't this work vvv
     //this.load.image('tcardinalR', './assets/logo.png');
     this.load.image('cardinalR', cardinalRImg);
-    this.load.image('turret', turret)
+    this.load.image('turret', turret);
+    this.load.image('nothing', nothing);
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
@@ -205,6 +207,7 @@ export default class GameScene extends Phaser.Scene {
     else{
       this.loadLevel(1)
     }
+    gameState.turret.changeMatrix(gameState.levels[gameState.levelNum].passMatrix());
   }
 
   loadLevel(inc){
@@ -351,12 +354,11 @@ export default class GameScene extends Phaser.Scene {
   //makes a turret
   turret(player){
     player.newTurret = false;
-    var turret = this.physics.add.sprite(player.x, player.y, 'turret');
-    var turret = new Turret(player);
+    gameState.turret = this.physics.add.sprite(player.x, player.y, 'turret');
+    gameState.turret = new Turret(gameState.turret, player, gameState.levels[gameState.levelNum].passMatrix());
     /*if (player == gameState.player1) { turret.tint = '#504cf8'; }
     else { turret.tint = '#88230E'}
     */
-
   }
 
 
@@ -366,6 +368,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(){
+    if (gameState.player2.turret){
+      gameState.turret.update([gameState.player1.x, gameState.player1.y]);
+    }
     gameState.player1.functions.updatePlayer();
     if (gameState.player1.newTurret){
       this.turret(gameState.player1);

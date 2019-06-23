@@ -194,9 +194,13 @@ export default class TreeTiling{
   //Makes a randomly generated map
   genRandom(midWidth, midHeight){
     var k = 0;
-    treeMatrix = Array(this.tileWidth - 9).fill(Array(this.tileWidth).fill(false));
+    this.treeMatrix = Array(this.tileWidth);
+    for (var z = 0; z < this.treeMatrix.length; z++){
+      this.treeMatrix[z] = Array(this.tileHeight).fill(false);
+    }
+    console.log(this.treeMatrix);
     for (var x = 4; x <= this.tileWidth - 5; x += 3){
-      for (var y = 0; y <= this.tileWidth; y += 3){
+      for (var y = 1; y <= this.tileHeight; y += 3){
         //change values of k to change density of trees
         k = this.random(0, 10);
         if (k <= 2)
@@ -204,11 +208,13 @@ export default class TreeTiling{
           for (var posX = x - 1; posX <= x + 1; posX++){
             for (var posY = y - 1; posY <= y + 1; posY++){
               this.addTile(posX, posY);
-              treeMatrix[posX][posY] = true;
+              console.log(posX, posY);
+              this.treeMatrix[posX][posY] = true;
             }
           }
         }
       }
+    console.log(this.treeMatrix);
     }
 
 
@@ -265,7 +271,7 @@ export default class TreeTiling{
       //println(imgs.get(t.getCode()));
       if (! this.isValidTile(t)) {
         //console.log(t.getCode());
-        console.log("removed " + t.getCode());
+        //console.log("removed " + t.getCode());
         this.removeTile(t);
       }
     }
@@ -788,5 +794,9 @@ export default class TreeTiling{
   random(num1, num2){
     num2 -= num1;
     return Math.floor((Math.random() * num2) + num1);
+  }
+
+  passMatrix(){
+    return this.treeMatrix;
   }
 }

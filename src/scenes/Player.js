@@ -279,7 +279,7 @@ export default class Player{
   wormAction(){
 
     console.log(this.player.berserk);
-    if (this.player.wormCount >= 5 && !(this.player.turret)){
+    if (this.player.wormCount >= 0 && !(this.player.turret)){
       this.turret();
     }
     else if (this.player.wormCount >= 3 && this.player.berserk == -1){

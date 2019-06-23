@@ -1,23 +1,40 @@
+//should be same as treeTiling
+var SIZE = 32;
+var SCALE = 1;
+
 export default class Turret{
 
-  constructor(player, tilingMatrix = [[]]){
-    this.posX = player.x;
-    this.posY = player.y;
+
+  constructor(turret, player, tilingMatrix = [[]]){
+    this.posX = Math.round(player.x / (SIZE * SCALE));
+    this.posY = Math.round(player.y / (SIZE * SCALE));
+    this.turret = turret;
     this.player = player;
     this.bullets = 30;
     this.FOV = tilingMatrix;
+    //turret.functions = this;
 
   }
 
-  update(oppPos){
+  changeMatrix(newMatrix){
+    this.FOV = newMatrix;
+  }
+
+  update(oppPos = []){
+    var resizedOpp = [Math.round(oppPos[0] / (SIZE * SCALE)), Math.round(oppPos[1] / (SIZE * SCALE))];
     //within range
-    if (abs(oppPos[0] - this.posX) <= 75 && abs(oppPos[1] - this.posY) <= 75){
+    if (Math.hypot((resizedOpp[0] - this.posX), (resizedOpp[1] - this.posY)) <= 8){
       //if not hiding under trees
-      if (this.FOV[oppPos[0]][oppPos[1]]){
-        this.fire();
+      if (!this.FOV[resizedOpp[0]][resizedOpp[1]]){
+        console.log('firing');
+      //  this.fire();
       }
+      else{console.log('hidden')}
     }
+    else{console.log('not firing')}
   }
+
+
 
 
 
