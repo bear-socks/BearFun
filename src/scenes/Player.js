@@ -9,7 +9,7 @@
 //   player1 = new Player(player1);
 //   player1.functions.move();
 
-//this variables get imoprted with the player class
+//this variables get imported with the player class
 //should be 200 when not testing
 var SPEED = 400;
 
@@ -296,6 +296,7 @@ export default class Player{
     this.player.hasPriority = true;
   }
 
+//places turret that fires at opponent
   turret(){
   this.addWorms(-5);
   this.player.turret = true;

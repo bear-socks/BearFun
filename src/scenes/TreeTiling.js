@@ -58,6 +58,7 @@ export default class TreeTiling{
     //this.imgs = {};
     this.tileWidth = width / SIZE;
     this.tileHeight = height / SIZE;
+    this.treeMatrix = [[]];
 
     this.loadImages();
     this.generate();
@@ -119,6 +120,7 @@ export default class TreeTiling{
     //remove tiles broken right now
     this.removeTiles();
     this.squareEdgesFix();
+
 
     // this.matchSides();
     // this.matchWedges();
@@ -192,6 +194,7 @@ export default class TreeTiling{
   //Makes a randomly generated map
   genRandom(midWidth, midHeight){
     var k = 0;
+    treeMatrix = Array(this.tileWidth - 9).fill(Array(this.tileWidth).fill(false));
     for (var x = 4; x <= this.tileWidth - 5; x += 3){
       for (var y = 0; y <= this.tileWidth; y += 3){
         //change values of k to change density of trees
@@ -201,6 +204,7 @@ export default class TreeTiling{
           for (var posX = x - 1; posX <= x + 1; posX++){
             for (var posY = y - 1; posY <= y + 1; posY++){
               this.addTile(posX, posY);
+              treeMatrix[posX][posY] = true;
             }
           }
         }

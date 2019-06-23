@@ -4,6 +4,7 @@ import 'phaser';
 import Player from "./Player.js"
 import Base from "./Base.js"
 import TreeTiling from "./TreeTiling.js"
+import Turret from "./Turret.js"
 
 import cardinalRImg from './assets/cardinalRight.png';
 import blueJay from './assets/blueJay.png'
@@ -347,9 +348,11 @@ export default class GameScene extends Phaser.Scene {
     //}
   }
 
+  //makes a turret
   turret(player){
     player.newTurret = false;
     var turret = this.physics.add.sprite(player.x, player.y, 'turret');
+    var turret = new Turret(player);
     /*if (player == gameState.player1) { turret.tint = '#504cf8'; }
     else { turret.tint = '#88230E'}
     */
