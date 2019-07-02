@@ -281,7 +281,7 @@ export default class GameScene extends Phaser.Scene {
 
     //loop for calling worms, change delay to change span pace
     gameState.wormGenLoop = this.time.addEvent({
-      delay: 1000,
+      delay: 8000,
       callback: genWorm,
       callbackScope: this,
       loop: true
@@ -370,6 +370,9 @@ export default class GameScene extends Phaser.Scene {
   update(){
     if (gameState.player2.turret){
       gameState.turret.update([gameState.player1.x, gameState.player1.y]);
+    }
+    if (gameState.player1.turret){
+      gameState.turret.update([gameState.player2.x, gameState.player2.y]);
     }
     gameState.player1.functions.updatePlayer();
     if (gameState.player1.newTurret){
