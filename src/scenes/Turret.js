@@ -21,7 +21,8 @@ export default class Turret{
     this.FOV = newMatrix;
   }
 
-  update(oppPos){
+
+  update(oppPos, gameState){
     var resizedOpp = [Math.round(oppPos[0] / (SIZE * SCALE)), Math.round(oppPos[1] / (SIZE * SCALE))];
     //within range
     var distanceToOpp = [(resizedOpp[0] - this.posX), (resizedOpp[1] - this.posY)];
@@ -30,7 +31,9 @@ export default class Turret{
       //if not hiding under trees
       if (!this.FOV[resizedOpp[0]][resizedOpp[1]]){
         //where turret fires
-        if (this.warmedUp >= 20) {console.log('firing');}
+        if (this.warmedUp >= 10) {console.log('firing');
+
+        }
         else {this.warmedUp +=1; console.log('warming up');}
 
         var target = ((-1 * (Math.atan2(distanceToOpp[0], distanceToOpp [1]) * 180 / Math.PI)) + 360) % 360;
@@ -39,12 +42,12 @@ export default class Turret{
 
         //turns towards other player
         if (between > 0){
-          if (Math.abs(between) <= 180) {this.turret.angle += 2;}
-          else {this.turret.angle -= 2;}
+          if (Math.abs(between) <= 180) {this.turret.angle += 4;}
+          else {this.turret.angle -= 4;}
         }
         else if (between < 0){
-          if (Math.abs(between) <= 180) {this.turret.angle -= 2;}
-          else {this.turret.angle += 2;}
+          if (Math.abs(between) <= 180) {this.turret.angle -= 4;}
+          else {this.turret.angle += 4;}
         }
       }
       else{
