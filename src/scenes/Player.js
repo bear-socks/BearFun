@@ -239,22 +239,28 @@ export default class Player{
   kill(otherPlayer){
     //stops the dashing
     this.player.lastKeys = {};
-    this.addScore(1);
-    if(otherPlayer.wormCount > 0){
-      otherPlayer.functions.addWorms(-1);
+    otherPlayer.functions.die(this.player);
+    }
+
+  //die is not seperated from kill so bullets can trigger it
+  die(otherPlayer){
+    if(this.player.wormCount > 0){
+      this.player.functions.addWorms(-1);
     }
 
     //something weird was going on with this line below
-    otherPlayer.respawnCounter = 100;
-    otherPlayer.setVelocity(0);
-    otherPlayer.disableInteractive();
-    otherPlayer.setCollideWorldBounds(false);
+    this.player.respawnCounter = 100;
+    this.player.setVelocity(0);
+    this.player.disableInteractive();
+    this.player.setCollideWorldBounds(false);
     //could cause a problem with both characters dying at the same time and going to the same position
     //so put in the random initX value
-    otherPlayer.setPosition(-1000, this.initX);
+    this.player.setPosition(-1000, this.initX);
 
-    otherPlayer.functions.setBaseOpen(true);
-    this.setBaseOpen(false);
+    this.player.functions.setBaseOpen(true);
+    otherPlayer.functions.setBaseOpen(false);
+    otherPlayer.functions.addScore(1)
+
   }
 
   addScore(num){
@@ -279,7 +285,7 @@ export default class Player{
   wormAction(){
 
     console.log(this.player.berserk);
-    if (this.player.wormCount >= 0 && !(this.player.turret)){
+    if (this.player.wormCount >= 5 && !(this.player.turret)){
       this.turret();
     }
     else if (this.player.wormCount >= 3 && this.player.berserk == -1){

@@ -1,4 +1,3 @@
-import 'phaser';
 
 //importing classes
 import Player from "./Player.js"
@@ -14,7 +13,8 @@ import worm from './assets/worm.png';
 import redTurret from './assets/redTurret.png'
 import blueTurret from './assets/blueTurret.png'
 import nothing from './assets/nothing.png'
-import bullet from "./assets/bullet.png";
+import blueBullet from "./assets/blueBullet.png";
+import redBullet from "./assets/redBullet.png";
 
 //loading sound is not working, not sure why
 //import tskyMall from './assets/skyMall.mp3';
@@ -43,7 +43,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('redTurret', redTurret);
     this.load.image('blueTurret', blueTurret);
     this.load.image('nothing', nothing);
-    this.load.image('bullet', bullet);
+    this.load.image('blueBullet', blueBullet);
+    this.load.image('redBullet', redBullet);
     this.load.spritesheet('blueJay', blueJay, {frameWidth: 23, frameHeight: 32});
     this.load.spritesheet('redBase', redBase, {frameWidth: 200, frameHeight: 500});
     this.load.spritesheet('blueBase', blueBase, {frameWidth: 200, frameHeight: 500});
@@ -62,12 +63,11 @@ export default class GameScene extends Phaser.Scene {
       gameState.graphics.fillStyle(0xAAAAAA, 1.0);
 
       gameState.graphics.fillCircle((gameState.width / 2) + i * 64, 50, 14).setDepth(5);
-    //graphics.fillRect(50, 50, 400, 200);
+      //graphics.fillRect(50, 50, 400, 200);
     }
   }
 
   create(){
-
     //gameState.treeTiling = new TreeTiling(this);
     gameState.levels[gameState.levelNum].display();
 
@@ -211,7 +211,12 @@ export default class GameScene extends Phaser.Scene {
     else{
       this.loadLevel(1)
     }
-    gameState.turret.changeMatrix(gameState.levels[gameState.levelNum].passMatrix());
+    if (gameState.player1.turret){
+      gameState.p1turret.changeMatrix(gameState.levels[gameState.levelNum].passMatrix());
+    }
+    if (gameState.player2.turret){
+      gameState.p2turret.changeMatrix(gameState.levels[gameState.levelNum].passMatrix());
+    }
   }
 
   loadLevel(inc){
@@ -236,13 +241,13 @@ export default class GameScene extends Phaser.Scene {
 
   gameOver(){
     var txt = this.add.text(0, 0, this.getWinner() +
-     " absolutely destroyed \n and won the game \n and saved the world!",
-     { fontSize: '45px', fill: '#FFFFFF'})
-     .setDepth(3);
+    " absolutely destroyed \n and won the game \n and saved the world!",
+    { fontSize: '45px', fill: '#FFFFFF'})
+    .setDepth(3);
 
-     txt.setPosition((gameState.width / 2) - txt.width / 2, (gameState.height / 2) - txt.height / 2);
+    txt.setPosition((gameState.width / 2) - txt.width / 2, (gameState.height / 2) - txt.height / 2);
 
-     this.physics.pause();
+    this.physics.pause();
   }
 
   getWinner(){
@@ -278,7 +283,6 @@ export default class GameScene extends Phaser.Scene {
       const y = Math.random() * gameState.height;
       gameState.worm.create(x, y, 'worm');
       gameState.worm.playAnimation(gameState.worm.animArr[0]);
-      //this.anims.play(gameState.worm.animArr[0], true);
     }
 
     gameState.worm = this.physics.add.staticGroup();
@@ -350,27 +354,58 @@ export default class GameScene extends Phaser.Scene {
   //Adds points when worms are eaten
   ateWorm(player, worm){
     //if (!player.isDashing){
-      player.functions.addWorms(1);
-      worm.destroy();// DEBUG:
+    player.functions.addWorms(1);
+    worm.destroy();// DEBUG:
     //}
   }
+
+
 
   //makes a turret
   turret(player){
     player.newTurret = false;
     if (player == gameState.player1){
-      gameState.p1Turret = this.physics.add.sprite(player.x, player.y, 'blueTurret');
-      gameState.p1Turret = new Turret(gameState.p1Turret, player, gameState.levels[gameState.levelNum].passMatrix());
+      gameState.p1turret = this.physics.add.sprite(player.x, player.y, 'blueTurret');
+      gameState.p1turret = new Turret(gameState.p1turret, player, 'blue', gameState.levels[gameState.levelNum].passMatrix());
+      gameState.p1bullets = this.physics.add.group();
+      this.physics.add.collider(gameState.player2, gameState.p1bullets, (player, bullet) => {
+        this.gotShot(player, bullet);
+      });
     }
     else {
-      gameState.p2Turret = this.physics.add.sprite(player.x, player.y, 'redTurret');
-      gameState.p2Turret = new Turret(gameState.p2Turret, player, gameState.levels[gameState.levelNum].passMatrix());
+      gameState.p2turret = this.physics.add.sprite(player.x, player.y, 'redTurret');
+      gameState.p2turret = new Turret(gameState.p2turret, player, 'red', gameState.levels[gameState.levelNum].passMatrix());
+      gameState.p2bullets = this.physics.add.group();
+      this.physics.add.collider(gameState.player1, gameState.p2bullets, (player, bullet) => {
+        this.gotShot(player, bullet);
+      });
+
     }
-    /*if (player == gameState.player1) { turret.tint = '#504cf8'; }
-    else { turret.tint = '#88230E'}
-    */
   }
 
+  fire(turret, opp){
+    if (turret == gameState.p1turret){
+      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'blueBullet');
+      gameState.p1bullets.add(gameState.newBullet);
+
+      //the unit circle is rotated 90 degrees clockwise, so some math is needed to correct for that
+      gameState.newBullet.setAngle(gameState.blueTurretAngle * 180 / Math.PI);
+      gameState.newBullet.setVelocity(400 * Math.cos(gameState.blueTurretAngle + Math.PI/2), 400 * Math.sin(gameState.blueTurretAngle + Math.PI/2));
+    }
+    else{
+      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'redBullet');
+      gameState.p2bullets.add(gameState.newBullet);
+      gameState.newBullet.setAngle(gameState.redTurretAngle * 180 / Math.PI);
+      gameState.newBullet.setVelocity(400 * Math.cos(gameState.redTurretAngle + Math.PI/2), 400 * Math.sin(gameState.redTurretAngle + Math.PI/2));
+    }
+  }
+
+  //triggers death by bullets
+  gotShot(player, bullet){
+    bullet.destroy();
+    if (player == gameState.player1) { player.functions.die(gameState.player2); }
+    else { player.functions.die(gameState.player1); }
+  }
 
   //do everything necessary to restart the game
   restartGame(){
@@ -379,10 +414,16 @@ export default class GameScene extends Phaser.Scene {
 
   update(){
     if (gameState.player1.turret){
-      gameState.p1Turret.update([gameState.player2.x, gameState.player2.y], gameState);
+      gameState.p1turret.update([gameState.player2.x, gameState.player2.y], gameState);
+      if (gameState.p1turret.warmedUp >= 25 && (gameState.p1turret.warmedUp % 10) == 0){
+        this.fire(gameState.p1turret, gameState.player2);
+      }
     }
     if (gameState.player2.turret){
-      gameState.p2Turret.update([gameState.player1.x, gameState.player1.y]);
+      gameState.p2turret.update([gameState.player1.x, gameState.player1.y], gameState);
+      if (gameState.p2turret.warmedUp >= 25 && (gameState.p2turret.warmedUp % 10) == 0){
+        this.fire(gameState.p2turret, gameState.player1);
+      }
     }
     gameState.player1.functions.updatePlayer();
     if (gameState.player1.newTurret){
