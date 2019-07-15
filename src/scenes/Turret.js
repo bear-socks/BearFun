@@ -25,7 +25,6 @@ export default class Turret{
     this.FOV = newMatrix;
   }
 
-
   update(oppPos, gameState){
 
     //gives angle of the turret to gameState, which is used for firing bullers

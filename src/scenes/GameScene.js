@@ -1,20 +1,21 @@
 
 //importing classes
-import Player from "./Player.js"
-import Base from "./Base.js"
-import TreeTiling from "./TreeTiling.js"
-import Turret from "./Turret.js"
+import Player from "./Player.js";
+import Base from "./Base.js";
+import TreeTiling from "./TreeTiling.js";
+import Turret from "./Turret.js";
 
 import cardinalRImg from './assets/cardinalRight.png';
 import blueJay from './assets/blueJay.png'
 import redBase from './assets/redGate.png';
 import blueBase from './assets/blueGate.png';
 import worm from './assets/worm.png';
-import redTurret from './assets/redTurret.png'
-import blueTurret from './assets/blueTurret.png'
-import nothing from './assets/nothing.png'
+import redTurret from './assets/redTurret.png';
+import blueTurret from './assets/blueTurret.png';
+import nothing from './assets/nothing.png';
 import blueBullet from "./assets/blueBullet.png";
 import redBullet from "./assets/redBullet.png";
+
 
 //loading sound is not working, not sure why
 //import tskyMall from './assets/skyMall.mp3';
@@ -365,27 +366,32 @@ export default class GameScene extends Phaser.Scene {
   turret(player){
     player.newTurret = false;
     if (player == gameState.player1){
-      gameState.p1turret = this.physics.add.sprite(player.x, player.y, 'blueTurret');
+      gameState.p1turret = this.physics.add.sprite(player.x, player.y, 'blueTurret').setDepth(3);
       gameState.p1turret = new Turret(gameState.p1turret, player, 'blue', gameState.levels[gameState.levelNum].passMatrix());
       gameState.p1bullets = this.physics.add.group();
       this.physics.add.collider(gameState.player2, gameState.p1bullets, (player, bullet) => {
         this.gotShot(player, bullet);
       });
+      this.physics.add.collider(gameState.player1, gameState.p1turret);
+      this.physics.add.collider(gameState.player2, gameState.p1turret);
     }
     else {
-      gameState.p2turret = this.physics.add.sprite(player.x, player.y, 'redTurret');
+      gameState.p2turret = this.physics.add.sprite(player.x, player.y, 'redTurret').setDepth(3);
       gameState.p2turret = new Turret(gameState.p2turret, player, 'red', gameState.levels[gameState.levelNum].passMatrix());
       gameState.p2bullets = this.physics.add.group();
       this.physics.add.collider(gameState.player1, gameState.p2bullets, (player, bullet) => {
         this.gotShot(player, bullet);
       });
+      this.physics.add.collider(gameState.player1, gameState.p2turret);
+      this.physics.add.collider(gameState.player2, gameState.p2turret);
+
 
     }
   }
 
   fire(turret, opp){
     if (turret == gameState.p1turret){
-      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'blueBullet');
+      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'blueBullet').setDepth(3);
       gameState.p1bullets.add(gameState.newBullet);
 
       //the unit circle is rotated 90 degrees clockwise, so some math is needed to correct for that
@@ -393,7 +399,7 @@ export default class GameScene extends Phaser.Scene {
       gameState.newBullet.setVelocity(400 * Math.cos(gameState.blueTurretAngle + Math.PI/2), 400 * Math.sin(gameState.blueTurretAngle + Math.PI/2));
     }
     else{
-      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'redBullet');
+      gameState.newBullet = this.physics.add.sprite(turret.realX, turret.realY, 'redBullet').setDepth(3);
       gameState.p2bullets.add(gameState.newBullet);
       gameState.newBullet.setAngle(gameState.redTurretAngle * 180 / Math.PI);
       gameState.newBullet.setVelocity(400 * Math.cos(gameState.redTurretAngle + Math.PI/2), 400 * Math.sin(gameState.redTurretAngle + Math.PI/2));
